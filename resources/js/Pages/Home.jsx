@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "@inertiajs/react";
 import {
     Fish,
     Droplets,
@@ -63,12 +64,18 @@ export default function AquaLife() {
                         </div>
 
                         <div className="hidden md:flex space-x-4">
-                            <button className="px-6 py-2 text-blue-600 border-2 border-blue-600 rounded-lg hover:bg-blue-50 font-medium transition">
+                            <Link
+                                href="/registrasi"
+                                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition inline-flex items-center"
+                            >
                                 Sign Up
-                            </button>
-                            <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition">
+                            </Link>
+                            <Link
+                                href="/login"
+                                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition inline-flex items-center"
+                            >
                                 Sign In
-                            </button>
+                            </Link>
                         </div>
 
                         {/* Mobile Menu Button */}
@@ -116,7 +123,10 @@ export default function AquaLife() {
                             <button className="w-full px-6 py-2 text-blue-600 border-2 border-blue-600 rounded-lg font-medium">
                                 Sign Up
                             </button>
-                            <button className="w-full px-6 py-2 bg-blue-600 text-white rounded-lg font-medium">
+                            <button
+                                className="w-full px-6 py-2 bg-blue-600 text-white rounded-lg font-medium"
+                                onClick={() => navigate("/login")}
+                            >
                                 Sign In
                             </button>
                         </div>
