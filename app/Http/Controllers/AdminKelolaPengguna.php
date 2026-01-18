@@ -11,11 +11,22 @@ use Inertia\Inertia;
 
 class AdminKelolaPengguna extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
-        $users = User::orderBy('created_at', 'desc')->paginate(10);
-
+        $perPage = $request->input('per_page', 10);
+        
+        // Validasi per_page
+        $allowedPerPage = [5, 10, 25, 50, 100];
+        if (!in_array($perPage, $allowedPerPage)) {
+            $perPage = 10;
+        }
+        
+        $users = User::orderBy('created_at', 'desc')->paginate($perPage);
+        
+        // Append per_page ke pagination links
+        $users->appends(['per_page' => $perPage]);
+    
         return Inertia::render("Admin/Kelola Pengguna/page", [
             'auth' => [
                 'user' => [
