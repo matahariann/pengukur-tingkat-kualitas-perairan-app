@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { router, usePage } from "@inertiajs/react";
+import { Fish, Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react";
 import { toast, Toaster } from "sonner";
 
 export default function Login() {
@@ -13,57 +14,6 @@ export default function Login() {
     });
     const errorShownRef = useRef(false);
     const errorTimeoutRef = useRef(null);
-
-    // Check for errors from page props (after redirect)
-    useEffect(() => {
-        // Clear timeout sebelumnya jika ada
-        if (errorTimeoutRef.current) {
-            clearTimeout(errorTimeoutRef.current);
-            errorTimeoutRef.current = null;
-        }
-
-        // Cek apakah ada error dari pageErrors atau flash
-        const hasPageError = pageErrors && Object.keys(pageErrors).length > 0;
-        const hasFlashError = flash && flash.error;
-
-        if (!hasPageError && !hasFlashError) {
-            // Reset flag jika tidak ada error
-            errorShownRef.current = false;
-            return;
-        }
-
-        // Hanya tampilkan jika belum pernah ditampilkan
-        if (!errorShownRef.current) {
-            errorShownRef.current = true;
-
-            // Prioritaskan error dari pageErrors, jika tidak ada gunakan flash.error
-            let errorMessage = "Email atau Password Salah";
-            if (hasPageError) {
-                errorMessage =
-                    pageErrors.email ||
-                    pageErrors.password ||
-                    Object.values(pageErrors)[0] ||
-                    errorMessage;
-            } else if (hasFlashError) {
-                errorMessage = flash.error;
-            }
-
-            // Gunakan timeout untuk debounce dan memastikan hanya satu toast
-            errorTimeoutRef.current = setTimeout(() => {
-                toast.error("Login Gagal", {
-                    description: errorMessage,
-                    duration: 5000,
-                });
-            }, 50);
-        }
-
-        // Cleanup
-        return () => {
-            if (errorTimeoutRef.current) {
-                clearTimeout(errorTimeoutRef.current);
-            }
-        };
-    }, [pageErrors, flash]);
 
     const validateEmail = (email) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -139,6 +89,56 @@ export default function Login() {
         }
     };
 
+    useEffect(() => {
+        // Clear timeout sebelumnya jika ada
+        if (errorTimeoutRef.current) {
+            clearTimeout(errorTimeoutRef.current);
+            errorTimeoutRef.current = null;
+        }
+
+        // Cek apakah ada error dari pageErrors atau flash
+        const hasPageError = pageErrors && Object.keys(pageErrors).length > 0;
+        const hasFlashError = flash && flash.error;
+
+        if (!hasPageError && !hasFlashError) {
+            // Reset flag jika tidak ada error
+            errorShownRef.current = false;
+            return;
+        }
+
+        // Hanya tampilkan jika belum pernah ditampilkan
+        if (!errorShownRef.current) {
+            errorShownRef.current = true;
+
+            // Prioritaskan error dari pageErrors, jika tidak ada gunakan flash.error
+            let errorMessage = "Email atau Password Salah";
+            if (hasPageError) {
+                errorMessage =
+                    pageErrors.email ||
+                    pageErrors.password ||
+                    Object.values(pageErrors)[0] ||
+                    errorMessage;
+            } else if (hasFlashError) {
+                errorMessage = flash.error;
+            }
+
+            // Gunakan timeout untuk debounce dan memastikan hanya satu toast
+            errorTimeoutRef.current = setTimeout(() => {
+                toast.error("Login Gagal", {
+                    description: errorMessage,
+                    duration: 5000,
+                });
+            }, 50);
+        }
+
+        // Cleanup
+        return () => {
+            if (errorTimeoutRef.current) {
+                clearTimeout(errorTimeoutRef.current);
+            }
+        };
+    }, [pageErrors, flash]);
+
     return (
         <>
             <Toaster
@@ -155,50 +155,177 @@ export default function Login() {
                     className: "sonner-toast",
                 }}
             />
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-yellow-50 flex items-center justify-center p-4 relative">
-                {/* Background Decorative Elements */}
-                <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                    <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse"></div>
+            <div className="min-h-screen bg-gradient-to-br from-blue-600 via-cyan-500 to-teal-400 flex items-center justify-center p-4 relative overflow-hidden">
+                {/* Animated Wave Background */}
+                <div className="absolute inset-0 overflow-hidden">
+                    {/* Multiple Animated Waves */}
+                    <svg
+                        className="absolute bottom-0 left-0 w-full h-full"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 1440 800"
+                        preserveAspectRatio="none"
+                    >
+                        <path
+                            fill="rgba(255,255,255,0.05)"
+                            d="M0,400 Q360,300 720,400 T1440,400 L1440,800 L0,800 Z"
+                        >
+                            <animate
+                                attributeName="d"
+                                dur="10s"
+                                repeatCount="indefinite"
+                                values="M0,400 Q360,300 720,400 T1440,400 L1440,800 L0,800 Z;
+                                    M0,400 Q360,500 720,400 T1440,400 L1440,800 L0,800 Z;
+                                    M0,400 Q360,300 720,400 T1440,400 L1440,800 L0,800 Z"
+                            />
+                        </path>
+                        <path
+                            fill="rgba(255,255,255,0.05)"
+                            d="M0,450 Q360,350 720,450 T1440,450 L1440,800 L0,800 Z"
+                        >
+                            <animate
+                                attributeName="d"
+                                dur="15s"
+                                repeatCount="indefinite"
+                                values="M0,450 Q360,350 720,450 T1440,450 L1440,800 L0,800 Z;
+                                    M0,450 Q360,550 720,450 T1440,450 L1440,800 L0,800 Z;
+                                    M0,450 Q360,350 720,450 T1440,450 L1440,800 L0,800 Z"
+                            />
+                        </path>
+                        <path
+                            fill="rgba(255,255,255,0.08)"
+                            d="M0,500 Q360,400 720,500 T1440,500 L1440,800 L0,800 Z"
+                        >
+                            <animate
+                                attributeName="d"
+                                dur="20s"
+                                repeatCount="indefinite"
+                                values="M0,500 Q360,400 720,500 T1440,500 L1440,800 L0,800 Z;
+                                    M0,500 Q360,600 720,500 T1440,500 L1440,800 L0,800 Z;
+                                    M0,500 Q360,400 720,500 T1440,500 L1440,800 L0,800 Z"
+                            />
+                        </path>
+                    </svg>
+
+                    {/* Floating Bubbles */}
                     <div
-                        className="absolute bottom-0 left-0 w-96 h-96 bg-yellow-400 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse"
-                        style={{ animationDelay: "1s" }}
+                        className="absolute top-20 left-10 w-16 h-16 bg-white/10 rounded-full animate-bounce"
+                        style={{
+                            animationDuration: "3s",
+                            animationDelay: "0s",
+                        }}
                     ></div>
+                    <div
+                        className="absolute top-40 right-20 w-12 h-12 bg-white/10 rounded-full animate-bounce"
+                        style={{
+                            animationDuration: "4s",
+                            animationDelay: "1s",
+                        }}
+                    ></div>
+                    <div
+                        className="absolute bottom-40 left-1/4 w-20 h-20 bg-white/10 rounded-full animate-bounce"
+                        style={{
+                            animationDuration: "5s",
+                            animationDelay: "2s",
+                        }}
+                    ></div>
+                    <div
+                        className="absolute top-1/3 right-1/4 w-14 h-14 bg-white/10 rounded-full animate-bounce"
+                        style={{
+                            animationDuration: "4.5s",
+                            animationDelay: "1.5s",
+                        }}
+                    ></div>
+                    <div
+                        className="absolute bottom-20 right-10 w-10 h-10 bg-white/10 rounded-full animate-bounce"
+                        style={{
+                            animationDuration: "3.5s",
+                            animationDelay: "0.5s",
+                        }}
+                    ></div>
+
+                    {/* Glowing Orbs */}
+                    <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-blue-400/20 rounded-full filter blur-3xl animate-pulse"></div>
+                    <div
+                        className="absolute bottom-1/4 right-1/3 w-96 h-96 bg-cyan-400/20 rounded-full filter blur-3xl animate-pulse"
+                        style={{ animationDelay: "2s" }}
+                    ></div>
+
+                    {/* Fish Icons Floating */}
+                    <div
+                        className="absolute top-1/4 left-10 opacity-20 animate-bounce"
+                        style={{ animationDuration: "6s" }}
+                    >
+                        <Fish className="w-8 h-8 text-white transform rotate-45" />
+                    </div>
+                    <div
+                        className="absolute bottom-1/3 right-20 opacity-20 animate-bounce"
+                        style={{
+                            animationDuration: "7s",
+                            animationDelay: "1s",
+                        }}
+                    >
+                        <Fish className="w-10 h-10 text-white transform -rotate-12" />
+                    </div>
+                    <div
+                        className="absolute top-1/2 right-1/4 opacity-20 animate-bounce"
+                        style={{
+                            animationDuration: "8s",
+                            animationDelay: "2s",
+                        }}
+                    >
+                        <Fish className="w-6 h-6 text-white transform rotate-90" />
+                    </div>
                 </div>
 
                 <div className="w-full max-w-md relative z-10">
                     {/* Login Card */}
-                    <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
-                        {/* Header Section */}
-                        <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-10 text-center relative">
-                            <div className="absolute top-0 left-0 w-full h-full opacity-10">
-                                <div className="absolute top-4 left-4 w-20 h-20 border-4 border-yellow-400 rounded-full"></div>
-                                <div className="absolute bottom-4 right-4 w-16 h-16 border-4 border-yellow-400 rounded-full"></div>
+                    <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl overflow-hidden border border-white/20">
+                        {/* Header Section with AquaLife Branding */}
+                        <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-cyan-600 px-8 py-12 text-center relative overflow-hidden">
+                            {/* Decorative Wave Background */}
+                            <div className="absolute inset-0 opacity-10">
+                                <svg
+                                    className="w-full h-full"
+                                    viewBox="0 0 400 200"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path fill="#ffffff" opacity="0.3">
+                                        <animate
+                                            attributeName="d"
+                                            dur="8s"
+                                            repeatCount="indefinite"
+                                            values="
+                                            M0,80 Q100,60 200,80 T400,80 L400,200 L0,200 Z;
+                                            M0,80 Q100,100 200,80 T400,80 L400,200 L0,200 Z;
+                                            M0,80 Q100,60 200,80 T400,80 L400,200 L0,200 Z
+                                        "
+                                        />
+                                    </path>
+                                </svg>
                             </div>
 
-                            {/* Logo Placeholder */}
-                            <div className="mb-4 flex justify-center">
-                                <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-lg">
-                                    <div className="text-3xl font-bold bg-gradient-to-br from-blue-600 to-blue-700 bg-clip-text text-transparent">
-                                        <img
-                                            src="/logo-memo.png"
-                                            alt="MEMO Logo"
-                                            className="w-12 h-12"
-                                        />
-                                    </div>
+                            {/* Logo */}
+                            <div className="mb-6 flex justify-center relative z-10">
+                                <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-2xl ring-4 ring-white/30 transform hover:scale-110 transition-transform duration-300">
+                                    <img
+                                        src="Logo.png"
+                                        alt="Logo"
+                                        className="w-14 h-14"
+                                    />
                                 </div>
                             </div>
 
-                            <h1 className="text-3xl font-bold text-white mb-2">
+                            <h1 className="text-3xl font-bold text-white mb-2 relative z-10">
                                 Selamat Datang
                             </h1>
-                            <p className="text-blue-100 text-sm">
-                                Masuk ke akun MEMO Anda
+                            <p className="text-blue-100 text-sm relative z-10">
+                                Masuk ke akun AquaLife Anda
                             </p>
                         </div>
 
                         {/* Form Section */}
                         <div className="px-8 py-8">
-                            <form onSubmit={handleSubmit} className="space-y-6">
+                            <div className="space-y-6">
                                 {/* Email Input */}
                                 <div>
                                     <label
@@ -209,19 +336,7 @@ export default function Login() {
                                     </label>
                                     <div className="relative">
                                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                            <svg
-                                                className="h-5 w-5 text-gray-400"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
-                                                />
-                                            </svg>
+                                            <Mail className="h-5 w-5 text-gray-400" />
                                         </div>
                                         <input
                                             id="email"
@@ -230,7 +345,7 @@ export default function Login() {
                                             value={formData.email}
                                             onChange={handleEmailChange}
                                             onKeyPress={handleKeyPress}
-                                            className={`w-full pl-12 pr-4 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${
+                                            className={`w-full pl-12 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all ${
                                                 validationErrors.email
                                                     ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                                                     : "border-gray-200 focus:border-blue-500 focus:ring-blue-200"
@@ -266,19 +381,7 @@ export default function Login() {
                                     </label>
                                     <div className="relative">
                                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                            <svg
-                                                className="h-5 w-5 text-gray-400"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                                                />
-                                            </svg>
+                                            <Lock className="h-5 w-5 text-gray-400" />
                                         </div>
                                         <input
                                             id="password"
@@ -291,7 +394,7 @@ export default function Login() {
                                             value={formData.password}
                                             onChange={handlePasswordChange}
                                             onKeyPress={handleKeyPress}
-                                            className={`w-full pl-12 pr-12 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${
+                                            className={`w-full pl-12 pr-12 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all ${
                                                 validationErrors.password
                                                     ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                                                     : "border-gray-200 focus:border-blue-500 focus:ring-blue-200"
@@ -306,39 +409,9 @@ export default function Login() {
                                             className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
                                         >
                                             {showPassword ? (
-                                                <svg
-                                                    className="h-5 w-5"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
-                                                >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth={2}
-                                                        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
-                                                    />
-                                                </svg>
+                                                <EyeOff className="h-5 w-5" />
                                             ) : (
-                                                <svg
-                                                    className="h-5 w-5"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
-                                                >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth={2}
-                                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                                    />
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth={2}
-                                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                                    />
-                                                </svg>
+                                                <Eye className="h-5 w-5" />
                                             )}
                                         </button>
                                     </div>
@@ -362,9 +435,9 @@ export default function Login() {
 
                                 {/* Submit Button */}
                                 <button
-                                    type="submit"
+                                    onClick={handleSubmit}
                                     disabled={processing}
-                                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3.5 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
+                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
                                 >
                                     {processing ? (
                                         <>
@@ -391,24 +464,25 @@ export default function Login() {
                                         </>
                                     ) : (
                                         <>
-                                            Masuk
-                                            <svg
-                                                className="ml-2 w-5 h-5"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M13 7l5 5m0 0l-5 5m5-5H6"
-                                                />
-                                            </svg>
+                                            <span>Masuk</span>
+                                            <ArrowRight className="ml-2 w-5 h-5" />
                                         </>
                                     )}
                                 </button>
-                            </form>
+
+                                {/* Additional Links */}
+                                <div className="text-center pt-4">
+                                    <p className="text-sm text-gray-600">
+                                        Belum punya akun?{" "}
+                                        <a
+                                            href="/registrasi"
+                                            className="text-blue-600 hover:text-blue-700 font-semibold"
+                                        >
+                                            Daftar Sekarang
+                                        </a>
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
