@@ -3,12 +3,25 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class MemberPembayaran extends Controller
 {
     public function index()
     {
-        return Inertia::render('Member/Pembayaran/page');
+        $user = Auth::user();
+
+        return Inertia::render("Member/Pembayaran/page", [
+            'auth' => [
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                    'membership' => $user->is_membership,
+                ]
+            ],
+        ]);
     }
 }
