@@ -40,13 +40,12 @@ export default function Login() {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Validasi client-side
         if (!validateForm()) {
             return;
         }
 
         setProcessing(true);
-        errorShownRef.current = false; // Reset flag on new submit
+        errorShownRef.current = false;
         const formDataToSend = new FormData();
         formDataToSend.append("email", formData.email);
         formDataToSend.append("password", formData.password);
@@ -54,9 +53,7 @@ export default function Login() {
         router.post("/actionLogin", formDataToSend, {
             onError: (errors) => {
                 setProcessing(false);
-                // Jangan tampilkan toast di sini, biarkan useEffect yang handle
-                // Karena setelah redirect, error akan tersedia di pageErrors atau flash
-                hasShownError.current = false; // Reset agar useEffect bisa trigger
+                errorShownRef.current = false;
             },
             onSuccess: () => {
                 setProcessing(false);
@@ -90,27 +87,22 @@ export default function Login() {
     };
 
     useEffect(() => {
-        // Clear timeout sebelumnya jika ada
         if (errorTimeoutRef.current) {
             clearTimeout(errorTimeoutRef.current);
             errorTimeoutRef.current = null;
         }
 
-        // Cek apakah ada error dari pageErrors atau flash
         const hasPageError = pageErrors && Object.keys(pageErrors).length > 0;
         const hasFlashError = flash && flash.error;
 
         if (!hasPageError && !hasFlashError) {
-            // Reset flag jika tidak ada error
             errorShownRef.current = false;
             return;
         }
 
-        // Hanya tampilkan jika belum pernah ditampilkan
         if (!errorShownRef.current) {
             errorShownRef.current = true;
 
-            // Prioritaskan error dari pageErrors, jika tidak ada gunakan flash.error
             let errorMessage = "Email atau Password Salah";
             if (hasPageError) {
                 errorMessage =
@@ -122,7 +114,6 @@ export default function Login() {
                 errorMessage = flash.error;
             }
 
-            // Gunakan timeout untuk debounce dan memastikan hanya satu toast
             errorTimeoutRef.current = setTimeout(() => {
                 toast.error("Login Gagal", {
                     description: errorMessage,
@@ -131,7 +122,6 @@ export default function Login() {
             }, 50);
         }
 
-        // Cleanup
         return () => {
             if (errorTimeoutRef.current) {
                 clearTimeout(errorTimeoutRef.current);
@@ -158,7 +148,6 @@ export default function Login() {
             <div className="min-h-screen bg-gradient-to-br from-blue-600 via-cyan-500 to-teal-400 flex items-center justify-center p-4 relative overflow-hidden">
                 {/* Animated Wave Background */}
                 <div className="absolute inset-0 overflow-hidden">
-                    {/* Multiple Animated Waves */}
                     <svg
                         className="absolute bottom-0 left-0 w-full h-full"
                         xmlns="http://www.w3.org/2000/svg"
@@ -278,35 +267,19 @@ export default function Login() {
                 </div>
 
                 <div className="w-full max-w-md relative z-10">
-                    {/* Login Card */}
-                    <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl overflow-hidden border border-white/20">
-                        {/* Header Section with AquaLife Branding */}
-                        <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-cyan-600 px-8 py-12 text-center relative overflow-hidden">
-                            {/* Decorative Wave Background */}
-                            <div className="absolute inset-0 opacity-10">
-                                <svg
-                                    className="w-full h-full"
-                                    viewBox="0 0 400 200"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path fill="#ffffff" opacity="0.3">
-                                        <animate
-                                            attributeName="d"
-                                            dur="8s"
-                                            repeatCount="indefinite"
-                                            values="
-                                            M0,80 Q100,60 200,80 T400,80 L400,200 L0,200 Z;
-                                            M0,80 Q100,100 200,80 T400,80 L400,200 L0,200 Z;
-                                            M0,80 Q100,60 200,80 T400,80 L400,200 L0,200 Z
-                                        "
-                                        />
-                                    </path>
-                                </svg>
-                            </div>
+                    {/* Glassmorphism Login Card */}
+                    <div className="bg-white/5 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden border border-white/30">
+                        {/* Gradient Top Border */}
+                        <div className="h-1.5 bg-gradient-to-r from-blue-400 via-cyan-400 to-emerald-400"></div>
+
+                        {/* Header Section */}
+                        <div className="px-8 py-10 text-center relative overflow-hidden">
+                            {/* Decorative Background */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent"></div>
 
                             {/* Logo */}
                             <div className="mb-6 flex justify-center relative z-10">
-                                <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-2xl ring-4 ring-white/30 transform hover:scale-110 transition-transform duration-300">
+                                <div className="w-20 h-20 bg-white/90 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-xl ring-4 ring-white/40 transform hover:scale-110 transition-transform duration-300">
                                     <img
                                         src="Logo.png"
                                         alt="Logo"
@@ -315,10 +288,10 @@ export default function Login() {
                                 </div>
                             </div>
 
-                            <h1 className="text-3xl font-bold text-white mb-2 relative z-10">
+                            <h1 className="text-3xl font-bold text-white mb-2 relative z-10 drop-shadow-lg">
                                 Selamat Datang
                             </h1>
-                            <p className="text-blue-100 text-sm relative z-10">
+                            <p className="text-white/90 text-sm relative z-10 drop-shadow-md">
                                 Masuk ke akun AquaLife Anda
                             </p>
                         </div>
@@ -330,13 +303,13 @@ export default function Login() {
                                 <div>
                                     <label
                                         htmlFor="email"
-                                        className="block text-sm font-semibold text-gray-700 mb-2"
+                                        className="block text-sm font-semibold text-white mb-2 drop-shadow"
                                     >
                                         Email
                                     </label>
                                     <div className="relative">
                                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                            <Mail className="h-5 w-5 text-gray-400" />
+                                            <Mail className="h-5 w-5 text-white/70" />
                                         </div>
                                         <input
                                             id="email"
@@ -345,16 +318,16 @@ export default function Login() {
                                             value={formData.email}
                                             onChange={handleEmailChange}
                                             onKeyPress={handleKeyPress}
-                                            className={`w-full pl-12 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all ${
+                                            className={`w-full pl-12 pr-4 py-3 bg-white/20 backdrop-blur-md border-2 rounded-xl focus:outline-none focus:ring-2 transition-all text-white placeholder-white/60 ${
                                                 validationErrors.email
-                                                    ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                                                    : "border-gray-200 focus:border-blue-500 focus:ring-blue-200"
+                                                    ? "border-red-300/50 focus:border-red-400 focus:ring-red-300/30"
+                                                    : "border-white/30 focus:border-white/50 focus:ring-white/20"
                                             }`}
                                             placeholder="nama@email.com"
                                         />
                                     </div>
                                     {validationErrors.email && (
-                                        <p className="mt-2 text-sm text-red-600 flex items-center">
+                                        <p className="mt-2 text-sm text-red-100 flex items-center drop-shadow-lg bg-red-500/20 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-red-300/30">
                                             <svg
                                                 className="w-4 h-4 mr-1"
                                                 fill="currentColor"
@@ -375,13 +348,13 @@ export default function Login() {
                                 <div>
                                     <label
                                         htmlFor="password"
-                                        className="block text-sm font-semibold text-gray-700 mb-2"
+                                        className="block text-sm font-semibold text-white mb-2 drop-shadow"
                                     >
                                         Password
                                     </label>
                                     <div className="relative">
                                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                            <Lock className="h-5 w-5 text-gray-400" />
+                                            <Lock className="h-5 w-5 text-white/70" />
                                         </div>
                                         <input
                                             id="password"
@@ -394,10 +367,10 @@ export default function Login() {
                                             value={formData.password}
                                             onChange={handlePasswordChange}
                                             onKeyPress={handleKeyPress}
-                                            className={`w-full pl-12 pr-12 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all ${
+                                            className={`w-full pl-12 pr-12 py-3 bg-white/20 backdrop-blur-md border-2 rounded-xl focus:outline-none focus:ring-2 transition-all text-white placeholder-white/60 ${
                                                 validationErrors.password
-                                                    ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                                                    : "border-gray-200 focus:border-blue-500 focus:ring-blue-200"
+                                                    ? "border-red-300/50 focus:border-red-400 focus:ring-red-300/30"
+                                                    : "border-white/30 focus:border-white/50 focus:ring-white/20"
                                             }`}
                                             placeholder="••••••••"
                                         />
@@ -406,7 +379,7 @@ export default function Login() {
                                             onClick={() =>
                                                 setShowPassword(!showPassword)
                                             }
-                                            className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                                            className="absolute inset-y-0 right-0 pr-4 flex items-center text-white/70 hover:text-white transition-colors"
                                         >
                                             {showPassword ? (
                                                 <EyeOff className="h-5 w-5" />
@@ -416,7 +389,7 @@ export default function Login() {
                                         </button>
                                     </div>
                                     {validationErrors.password && (
-                                        <p className="mt-2 text-sm text-red-600 flex items-center">
+                                        <p className="mt-2 text-sm text-red-100 flex items-center drop-shadow-lg bg-red-500/20 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-red-300/30">
                                             <svg
                                                 className="w-4 h-4 mr-1"
                                                 fill="currentColor"
@@ -437,7 +410,7 @@ export default function Login() {
                                 <button
                                     onClick={handleSubmit}
                                     disabled={processing}
-                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
+                                    className="w-full bg-gradient-to-r from-blue-600 via-cyan-500 to-emerald-500 hover:from-blue-700 hover:via-cyan-600 hover:to-emerald-600 text-white font-semibold py-4 px-6 rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center relative overflow-hidden group border border-white/20"
                                 >
                                     {processing ? (
                                         <>
@@ -464,19 +437,23 @@ export default function Login() {
                                         </>
                                     ) : (
                                         <>
-                                            <span>Masuk</span>
-                                            <ArrowRight className="ml-2 w-5 h-5" />
+                                            <span className="relative z-10">
+                                                Masuk
+                                            </span>
+                                            <ArrowRight className="ml-2 w-5 h-5 relative z-10" />
+                                            {/* Shimmer Effect */}
+                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></div>
                                         </>
                                     )}
                                 </button>
 
                                 {/* Additional Links */}
                                 <div className="text-center pt-4">
-                                    <p className="text-sm text-gray-600">
+                                    <p className="text-sm text-white/90 drop-shadow">
                                         Belum punya akun?{" "}
                                         <a
                                             href="/registrasi"
-                                            className="text-blue-600 hover:text-blue-700 font-semibold"
+                                            className="text-white font-semibold hover:text-white/80 transition-colors underline decoration-2 underline-offset-2"
                                         >
                                             Daftar Sekarang
                                         </a>
@@ -484,6 +461,9 @@ export default function Login() {
                                 </div>
                             </div>
                         </div>
+
+                        {/* Bottom Decorative */}
+                        <div className="h-3 bg-gradient-to-r from-white/10 via-white/20 to-white/10"></div>
                     </div>
                 </div>
             </div>

@@ -187,45 +187,30 @@ export default function Registrasi() {
                 </div>
 
                 <div className="w-full max-w-4xl relative z-10">
-                    {/* Registration Card */}
-                    <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl overflow-hidden border border-white/20">
+                    {/* Glassmorphism Registration Card */}
+                    <div className="bg-white/15 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden border border-white/30">
+                        {/* Gradient Top Border */}
+                        <div className="h-1.5 bg-gradient-to-r from-blue-400 via-cyan-400 to-emerald-400"></div>
+
                         {/* Header Section */}
-                        <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-cyan-600 px-8 py-12 text-center relative overflow-hidden">
-                            {/* Decorative Wave Background */}
-                            <div className="absolute inset-0 opacity-10">
-                                <svg
-                                    className="w-full h-full"
-                                    viewBox="0 0 400 200"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path fill="#ffffff" opacity="0.3">
-                                        <animate
-                                            attributeName="d"
-                                            dur="8s"
-                                            repeatCount="indefinite"
-                                            values="
-                                                M0,80 Q100,60 200,80 T400,80 L400,200 L0,200 Z;
-                                                M0,80 Q100,100 200,80 T400,80 L400,200 L0,200 Z;
-                                                M0,80 Q100,60 200,80 T400,80 L400,200 L0,200 Z
-                                            "
-                                        />
-                                    </path>
-                                </svg>
-                            </div>
+                        <div className="px-8 py-10 text-center relative overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent"></div>
 
                             {/* Logo */}
                             <div className="mb-6 flex justify-center relative z-10">
-                                <img
-                                    src="Logo.png"
-                                    alt="Logo"
-                                    className="w-14 h-14"
-                                />
+                                <div className="w-20 h-20 bg-white/90 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-xl ring-4 ring-white/40 transform hover:scale-110 transition-transform duration-300">
+                                    <img
+                                        src="Logo.png"
+                                        alt="Logo"
+                                        className="w-14 h-14"
+                                    />
+                                </div>
                             </div>
 
-                            <h1 className="text-3xl font-bold text-white mb-2 relative z-10">
+                            <h1 className="text-3xl font-bold text-white mb-2 relative z-10 drop-shadow-lg">
                                 Buat Akun Baru
                             </h1>
-                            <p className="text-blue-100 text-sm relative z-10">
+                            <p className="text-white/90 text-sm relative z-10 drop-shadow-md">
                                 Bergabunglah dengan AquaLife sekarang
                             </p>
                         </div>
@@ -237,13 +222,13 @@ export default function Registrasi() {
                                 <div>
                                     <label
                                         htmlFor="name"
-                                        className="block text-sm font-semibold text-gray-700 mb-2"
+                                        className="block text-sm font-semibold text-white mb-2 drop-shadow-lg"
                                     >
                                         Nama Lengkap
                                     </label>
                                     <div className="relative">
                                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                            <User className="h-5 w-5 text-gray-400" />
+                                            <User className="h-5 w-5 text-white/80" />
                                         </div>
                                         <input
                                             id="name"
@@ -257,18 +242,18 @@ export default function Registrasi() {
                                                 )
                                             }
                                             onKeyPress={handleKeyPress}
-                                            className={`w-full pl-12 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all ${
+                                            className={`w-full pl-12 pr-4 py-3 bg-white/30 backdrop-blur-md border-2 rounded-xl focus:outline-none focus:ring-2 transition-all text-white placeholder-white/60 font-medium ${
                                                 errors.name
-                                                    ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                                                    : "border-gray-200 focus:border-blue-500 focus:ring-blue-200"
+                                                    ? "border-red-400 focus:border-red-500 focus:ring-red-300/50"
+                                                    : "border-white/40 focus:border-white/60 focus:ring-white/30"
                                             }`}
                                             placeholder="Nama Anda"
                                         />
                                     </div>
                                     {errors.name && (
-                                        <p className="mt-2 text-sm text-red-600 flex items-center">
+                                        <p className="mt-2 text-sm text-red-100 flex items-center drop-shadow-lg bg-red-500/20 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-red-300/30">
                                             <svg
-                                                className="w-4 h-4 mr-1"
+                                                className="w-4 h-4 mr-1.5 flex-shrink-0"
                                                 fill="currentColor"
                                                 viewBox="0 0 20 20"
                                             >
@@ -287,13 +272,13 @@ export default function Registrasi() {
                                 <div>
                                     <label
                                         htmlFor="email"
-                                        className="block text-sm font-semibold text-gray-700 mb-2"
+                                        className="block text-sm font-semibold text-white mb-2 drop-shadow-lg"
                                     >
                                         Email
                                     </label>
                                     <div className="relative">
                                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                            <Mail className="h-5 w-5 text-gray-400" />
+                                            <Mail className="h-5 w-5 text-white/80" />
                                         </div>
                                         <input
                                             id="email"
@@ -307,18 +292,18 @@ export default function Registrasi() {
                                                 )
                                             }
                                             onKeyPress={handleKeyPress}
-                                            className={`w-full pl-12 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all ${
+                                            className={`w-full pl-12 pr-4 py-3 bg-white/30 backdrop-blur-md border-2 rounded-xl focus:outline-none focus:ring-2 transition-all text-white placeholder-white/60 font-medium ${
                                                 errors.email
-                                                    ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                                                    : "border-gray-200 focus:border-blue-500 focus:ring-blue-200"
+                                                    ? "border-red-400 focus:border-red-500 focus:ring-red-300/50"
+                                                    : "border-white/40 focus:border-white/60 focus:ring-white/30"
                                             }`}
                                             placeholder="nama@email.com"
                                         />
                                     </div>
                                     {errors.email && (
-                                        <p className="mt-2 text-sm text-red-600 flex items-center">
+                                        <p className="mt-2 text-sm text-red-100 flex items-center drop-shadow-lg bg-red-500/20 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-red-300/30">
                                             <svg
-                                                className="w-4 h-4 mr-1"
+                                                className="w-4 h-4 mr-1.5 flex-shrink-0"
                                                 fill="currentColor"
                                                 viewBox="0 0 20 20"
                                             >
@@ -337,13 +322,13 @@ export default function Registrasi() {
                                 <div>
                                     <label
                                         htmlFor="password"
-                                        className="block text-sm font-semibold text-gray-700 mb-2"
+                                        className="block text-sm font-semibold text-white mb-2 drop-shadow-lg"
                                     >
                                         Password
                                     </label>
                                     <div className="relative">
                                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                            <Lock className="h-5 w-5 text-gray-400" />
+                                            <Lock className="h-5 w-5 text-white/80" />
                                         </div>
                                         <input
                                             id="password"
@@ -361,10 +346,10 @@ export default function Registrasi() {
                                                 )
                                             }
                                             onKeyPress={handleKeyPress}
-                                            className={`w-full pl-12 pr-12 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all ${
+                                            className={`w-full pl-12 pr-12 py-3 bg-white/30 backdrop-blur-md border-2 rounded-xl focus:outline-none focus:ring-2 transition-all text-white placeholder-white/60 font-medium ${
                                                 errors.password
-                                                    ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                                                    : "border-gray-200 focus:border-blue-500 focus:ring-blue-200"
+                                                    ? "border-red-400 focus:border-red-500 focus:ring-red-300/50"
+                                                    : "border-white/40 focus:border-white/60 focus:ring-white/30"
                                             }`}
                                             placeholder="••••••••"
                                         />
@@ -373,7 +358,7 @@ export default function Registrasi() {
                                             onClick={() =>
                                                 setShowPassword(!showPassword)
                                             }
-                                            className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                                            className="absolute inset-y-0 right-0 pr-4 flex items-center text-white/80 hover:text-white transition-colors"
                                         >
                                             {showPassword ? (
                                                 <EyeOff className="h-5 w-5" />
@@ -383,9 +368,9 @@ export default function Registrasi() {
                                         </button>
                                     </div>
                                     {errors.password && (
-                                        <p className="mt-2 text-sm text-red-600 flex items-center">
+                                        <p className="mt-2 text-sm text-red-100 flex items-center drop-shadow-lg bg-red-500/20 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-red-300/30">
                                             <svg
-                                                className="w-4 h-4 mr-1"
+                                                className="w-4 h-4 mr-1.5 flex-shrink-0"
                                                 fill="currentColor"
                                                 viewBox="0 0 20 20"
                                             >
@@ -404,13 +389,13 @@ export default function Registrasi() {
                                 <div>
                                     <label
                                         htmlFor="password_confirmation"
-                                        className="block text-sm font-semibold text-gray-700 mb-2"
+                                        className="block text-sm font-semibold text-white mb-2 drop-shadow-lg"
                                     >
                                         Konfirmasi Password
                                     </label>
                                     <div className="relative">
                                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                            <Lock className="h-5 w-5 text-gray-400" />
+                                            <Lock className="h-5 w-5 text-white/80" />
                                         </div>
                                         <input
                                             id="password_confirmation"
@@ -428,10 +413,10 @@ export default function Registrasi() {
                                                 )
                                             }
                                             onKeyPress={handleKeyPress}
-                                            className={`w-full pl-12 pr-12 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all ${
+                                            className={`w-full pl-12 pr-12 py-3 bg-white/30 backdrop-blur-md border-2 rounded-xl focus:outline-none focus:ring-2 transition-all text-white placeholder-white/60 font-medium ${
                                                 errors.password_confirmation
-                                                    ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                                                    : "border-gray-200 focus:border-blue-500 focus:ring-blue-200"
+                                                    ? "border-red-400 focus:border-red-500 focus:ring-red-300/50"
+                                                    : "border-white/40 focus:border-white/60 focus:ring-white/30"
                                             }`}
                                             placeholder="••••••••"
                                         />
@@ -442,7 +427,7 @@ export default function Registrasi() {
                                                     !showConfirmPassword
                                                 )
                                             }
-                                            className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                                            className="absolute inset-y-0 right-0 pr-4 flex items-center text-white/80 hover:text-white transition-colors"
                                         >
                                             {showConfirmPassword ? (
                                                 <EyeOff className="h-5 w-5" />
@@ -452,9 +437,9 @@ export default function Registrasi() {
                                         </button>
                                     </div>
                                     {errors.password_confirmation && (
-                                        <p className="mt-2 text-sm text-red-600 flex items-center">
+                                        <p className="mt-2 text-sm text-red-100 flex items-center drop-shadow-lg bg-red-500/20 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-red-300/30">
                                             <svg
-                                                className="w-4 h-4 mr-1"
+                                                className="w-4 h-4 mr-1.5 flex-shrink-0"
                                                 fill="currentColor"
                                                 viewBox="0 0 20 20"
                                             >
@@ -476,7 +461,7 @@ export default function Registrasi() {
                                     type="button"
                                     onClick={handleSubmit}
                                     disabled={processing}
-                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
+                                    className="w-full bg-gradient-to-r from-blue-600 via-cyan-500 to-emerald-500 hover:from-blue-700 hover:via-cyan-600 hover:to-emerald-600 text-white font-semibold py-4 px-6 rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center relative overflow-hidden group border border-white/20"
                                 >
                                     {processing ? (
                                         <>
@@ -503,8 +488,11 @@ export default function Registrasi() {
                                         </>
                                     ) : (
                                         <>
-                                            <span>Daftar Sekarang</span>
-                                            <ArrowRight className="ml-2 w-5 h-5" />
+                                            <span className="relative z-10">
+                                                Daftar Sekarang
+                                            </span>
+                                            <ArrowRight className="ml-2 w-5 h-5 relative z-10" />
+                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></div>
                                         </>
                                     )}
                                 </button>
@@ -512,17 +500,20 @@ export default function Registrasi() {
 
                             {/* Additional Links */}
                             <div className="text-center pt-4">
-                                <p className="text-sm text-gray-600">
+                                <p className="text-sm text-white/90 drop-shadow">
                                     Sudah punya akun?{" "}
                                     <a
                                         href="/login"
-                                        className="text-blue-600 hover:text-blue-700 font-semibold"
+                                        className="text-white font-semibold hover:text-white/80 transition-colors underline decoration-2 underline-offset-2"
                                     >
                                         Masuk Sekarang
                                     </a>
                                 </p>
                             </div>
                         </div>
+
+                        {/* Bottom Decorative */}
+                        <div className="h-3 bg-gradient-to-r from-white/10 via-white/20 to-white/10"></div>
                     </div>
                 </div>
             </div>
