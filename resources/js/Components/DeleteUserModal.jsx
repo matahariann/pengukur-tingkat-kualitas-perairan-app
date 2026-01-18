@@ -1,7 +1,13 @@
 import React from "react";
 import { Trash2, X } from "lucide-react";
 
-export default function DeleteUserModal({ isOpen, onClose, user, onConfirm }) {
+export default function DeleteUserModal({
+    isOpen,
+    onClose,
+    user,
+    onConfirm,
+    processing,
+}) {
     if (!isOpen) return null;
 
     return (
@@ -19,7 +25,8 @@ export default function DeleteUserModal({ isOpen, onClose, user, onConfirm }) {
 
                 <button
                     onClick={onClose}
-                    className="absolute top-6 right-6 p-2.5 rounded-xl bg-white/20 hover:bg-white/30 backdrop-blur-md transition-all duration-300 group z-10 border border-white/40 hover:border-white/60 shadow-lg"
+                    disabled={processing}
+                    className="absolute top-6 right-6 p-2.5 rounded-xl bg-white/20 hover:bg-white/30 backdrop-blur-md transition-all duration-300 group z-10 border border-white/40 hover:border-white/60 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <X className="text-xl text-white group-hover:rotate-90 transition-all duration-300 drop-shadow-lg" />
                 </button>
@@ -52,16 +59,18 @@ export default function DeleteUserModal({ isOpen, onClose, user, onConfirm }) {
                     <div className="flex gap-4">
                         <button
                             onClick={onClose}
-                            className="flex-1 bg-white/20 backdrop-blur-md border-2 border-white/40 text-white font-semibold py-4 px-6 rounded-xl hover:bg-white/30 hover:border-white/60 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
+                            disabled={processing}
+                            className="flex-1 bg-white/20 backdrop-blur-md border-2 border-white/40 text-white font-semibold py-4 px-6 rounded-xl hover:bg-white/30 hover:border-white/60 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         >
                             Batal
                         </button>
                         <button
                             onClick={onConfirm}
-                            className="flex-1 bg-gradient-to-r from-red-600 via-red-500 to-red-600 text-white font-semibold py-4 px-6 rounded-xl hover:from-red-700 hover:via-red-600 hover:to-red-700 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden group border border-white/20"
+                            disabled={processing}
+                            className="flex-1 bg-gradient-to-r from-red-600 via-red-500 to-red-600 text-white font-semibold py-4 px-6 rounded-xl hover:from-red-700 hover:via-red-600 hover:to-red-700 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden group border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         >
                             <span className="relative z-10 flex items-center justify-center gap-2">
-                                Ya, Hapus
+                                {processing ? "Menghapus..." : "Ya, Hapus"}
                                 <Trash2 className="text-lg" />
                             </span>
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></div>

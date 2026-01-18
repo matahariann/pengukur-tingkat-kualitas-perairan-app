@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Trash2, Edit, Plus } from "lucide-react";
 import { IoPeopleOutline } from "react-icons/io5";
+import { router, useForm } from "@inertiajs/react";
+import { toast, Toaster } from "sonner";
 import AdminLayout from "@/Layouts/AdminLayout";
 import AddUserModal from "@/Components/AddUserModal";
 import EditUserModal from "@/Components/EditUserModal";
@@ -12,6 +14,8 @@ export default function AdminKelolaPengguna({ users }) {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
+
+    const { delete: destroy, processing } = useForm();
 
     const [addForm, setAddForm] = useState({
         name: "",
@@ -67,9 +71,29 @@ export default function AdminKelolaPengguna({ users }) {
     };
 
     const handleDeleteConfirm = () => {
-        console.log("Delete user:", selectedUser);
-        setShowDeleteModal(false);
-        setSelectedUser(null);
+        if (selectedUser) {
+            destroy(`/admin/kelola-pengguna/${selectedUser.id}`, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setShowDeleteModal(false);
+                    setSelectedUser(null);
+                    toast.success("Berhasil!", {
+                        description: "Pengguna berhasil dihapus",
+                        duration: 3000,
+                    });
+                },
+                onError: (errors) => {
+                    console.error("Error deleting user:", errors);
+                    toast.error("Gagal!", {
+                        description: "Gagal menghapus pengguna",
+                        duration: 3000,
+                    });
+                },
+                onFinish: () => {
+                    console.log("Request finished");
+                },
+            });
+        }
     };
 
     const getRoleBadgeColor = (role) => {
@@ -85,6 +109,12 @@ export default function AdminKelolaPengguna({ users }) {
 
     return (
         <AdminLayout>
+            <Toaster
+                position="top-right"
+                expand={true}
+                richColors
+                closeButton
+            />
             <main className="min-h-screen bg-gradient-to-br from-sky-50 to-blue-100 p-6">
                 <div className="max-w-7xl mx-auto">
                     {/* Header */}
@@ -232,6 +262,7 @@ export default function AdminKelolaPengguna({ users }) {
                     onClose={() => setShowDeleteModal(false)}
                     user={selectedUser}
                     onConfirm={handleDeleteConfirm}
+                    processing={processing}
                 />
 
                 {/* Modal Styles */}
