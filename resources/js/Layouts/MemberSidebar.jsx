@@ -11,16 +11,16 @@ const MemberSidebar = ({ handleLogout }) => {
     const { url } = usePage();
 
     const menuItems = [
-        {
-            href: "/member/pembayaran",
-            icon: CiMoneyBill,
-            label: "Kelola Pembayaran",
-        },
         { href: "/member/history", icon: MdOutlineHistory, label: "History" },
         {
             href: "/member/hitung-kualitas-air",
             icon: IoWaterOutline,
             label: "Hitung Kualitas Air",
+        },
+        {
+            href: "/member/pembayaran",
+            icon: CiMoneyBill,
+            label: "Pembayaran",
         },
     ];
 

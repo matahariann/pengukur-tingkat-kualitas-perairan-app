@@ -83,7 +83,7 @@ class AuthController extends Controller
             if (Auth::user()->role === 'member') {
                 return redirect()->route('member.history');
             } elseif (Auth::user()->role === 'operator') {
-                return redirect()->route('operator.history');
+                return redirect()->route('operator.kelola-bobot');
             } if (Auth::user()->role === 'admin') {
                 return redirect()->route('admin.kelola-pengguna');
             }

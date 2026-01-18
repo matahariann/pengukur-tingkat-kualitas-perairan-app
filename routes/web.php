@@ -91,7 +91,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/kelola-bobot', [OperatorKelolaBobot::class, 'index'])->name('kelola-bobot');
 
         // Kelola Pembayaran
-        Route::get('/kelola-pembayaran', [OperatorKelolaStation::class, 'index'])->name('kelola-pembayaran');
+        Route::get('/kelola-station', [OperatorKelolaStation::class, 'index'])->name('kelola-station');
     });
 
     // Member routes

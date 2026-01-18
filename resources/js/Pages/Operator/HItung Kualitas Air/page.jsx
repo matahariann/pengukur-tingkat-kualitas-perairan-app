@@ -1,13 +1,16 @@
 import React from "react";
+import OperatorLayout from "../../../Layouts/OperatorLayout";
 
 export default function OperatorHitungKualitasAir() {
     return (
-        <main className="min-h-screen bg-gradient-to-br from-sky-100 to-blue-200 flex items-center justify-center">
-            <div className="bg-white rounded-2xl shadow-xl px-10 py-8 text-center">
-                <h1 className="text-4xl font-extrabold text-blue-600 mb-2">
-                    Operator Hitung Kualitas Air
-                </h1>
-            </div>
-        </main>
+        <OperatorLayout>
+            <main className="min-h-screen bg-gradient-to-br from-sky-100 to-blue-200 flex items-center justify-center">
+                <div className="bg-white rounded-2xl shadow-xl px-10 py-8 text-center">
+                    <h1 className="text-4xl font-extrabold text-blue-600 mb-2">
+                        Operator Hitung Kualitas Air
+                    </h1>
+                </div>
+            </main>
+        </OperatorLayout>
     );
 }
