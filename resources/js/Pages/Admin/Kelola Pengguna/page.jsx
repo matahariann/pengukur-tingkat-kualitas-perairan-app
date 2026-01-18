@@ -14,6 +14,7 @@ export default function AdminKelolaPengguna({ users }) {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
+    const [editErrors, setEditErrors] = useState({});
 
     const { delete: destroy, processing } = useForm();
 
@@ -55,14 +56,41 @@ export default function AdminKelolaPengguna({ users }) {
             role: user.role,
             is_membership: user.is_membership,
         });
+        setEditErrors({});
         setShowEditModal(true);
     };
 
     const handleEditSubmit = (e) => {
         e.preventDefault();
-        console.log("Edit user:", editForm);
-        setShowEditModal(false);
-        setSelectedUser(null);
+
+        if (selectedUser) {
+            router.put(`/admin/kelola-pengguna/${selectedUser.id}`, editForm, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setShowEditModal(false);
+                    setEditForm({
+                        name: "",
+                        email: "",
+                        password: "",
+                        role: "member",
+                        is_membership: false,
+                    });
+                    setEditErrors({});
+                    setSelectedUser(null);
+                    toast.success("Berhasil!", {
+                        description: "Pengguna berhasil diupdate",
+                        duration: 3000,
+                    });
+                },
+                onError: (errors) => {
+                    setEditErrors(errors);
+                    toast.error("Gagal Update", {
+                        description: "Mohon periksa kembali form Anda.",
+                        duration: 3000,
+                    });
+                },
+            });
+        }
     };
 
     const handleDeleteClick = (user) => {
@@ -94,6 +122,19 @@ export default function AdminKelolaPengguna({ users }) {
                 },
             });
         }
+    };
+
+    const handleCloseEditModal = () => {
+        setShowEditModal(false);
+        setEditForm({
+            name: "",
+            email: "",
+            password: "",
+            role: "member",
+            is_membership: false,
+        });
+        setEditErrors({});
+        setSelectedUser(null);
     };
 
     const getRoleBadgeColor = (role) => {
@@ -272,10 +313,12 @@ export default function AdminKelolaPengguna({ users }) {
 
                 <EditUserModal
                     isOpen={showEditModal}
-                    onClose={() => setShowEditModal(false)}
+                    onClose={handleCloseEditModal}
                     form={editForm}
                     setForm={setEditForm}
                     onSubmit={handleEditSubmit}
+                    selectedUser={selectedUser}
+                    serverErrors={editErrors}
                 />
 
                 <DeleteUserModal

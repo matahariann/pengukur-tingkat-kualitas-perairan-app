@@ -55,6 +55,15 @@ class AdminKelolaPengguna extends Controller
             'password' => 'nullable|string|min:8',
             'role' => 'required|in:member,operator,admin',
             'is_membership' => 'boolean',
+        ], [
+            'name.required' => 'Nama tidak boleh kosong',
+            'name.min' => 'Nama minimal 3 karakter',
+            'email.required' => 'Email tidak boleh kosong',
+            'email.email' => 'Format email tidak valid',
+            'email.unique' => 'Email sudah terdaftar',
+            'password.required' => 'Password tidak boleh kosong',
+            'password.min' => 'Password minimal 8 karakter',
+            'password.confirmed' => 'Password tidak sama',
         ]);
 
         if (!empty($validated['password'])) {
