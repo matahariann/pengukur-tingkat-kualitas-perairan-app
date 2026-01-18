@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { router } from "@inertiajs/react";
 import MemberSidebar from "./MemberSidebar";
-import LogoutModal from "./LogoutModal";
+import LogoutModal from "../Components/LogoutModal";
 
 const MemberLayout = ({ children }) => {
     const [showLogoutModal, setShowLogoutModal] = useState(false);

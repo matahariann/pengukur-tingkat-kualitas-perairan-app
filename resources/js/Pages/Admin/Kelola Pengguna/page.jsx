@@ -1,15 +1,241 @@
-import React from "react";
-import AdminLayout from "../../../Layouts/AdminLayout";
+import React, { useState } from "react";
+import { Trash2, Edit, Plus } from "lucide-react";
+import { IoPeopleOutline } from "react-icons/io5";
+import AdminLayout from "@/Layouts/AdminLayout";
+import AddUserModal from "@/Components/AddUserModal";
+import EditUserModal from "@/Components/EditUserModal";
+import DeleteUserModal from "@/Components/DeleteUserModal";
+import ModalStyles from "@/Components/ModalStyles";
 
-export default function AdminKelolaPengguna() {
+export default function AdminKelolaPengguna({ users }) {
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
+
+    const [addForm, setAddForm] = useState({
+        name: "",
+        email: "",
+        password: "",
+        role: "member",
+        is_membership: false,
+    });
+
+    const [editForm, setEditForm] = useState({
+        name: "",
+        email: "",
+        password: "",
+        role: "member",
+        is_membership: false,
+    });
+
+    const handleAddSubmit = (e) => {
+        e.preventDefault();
+        console.log("Add user:", addForm);
+        setShowAddModal(false);
+        setAddForm({
+            name: "",
+            email: "",
+            password: "",
+            role: "member",
+            is_membership: false,
+        });
+    };
+
+    const handleEditClick = (user) => {
+        setSelectedUser(user);
+        setEditForm({
+            name: user.name,
+            email: user.email,
+            password: "",
+            role: user.role,
+            is_membership: user.is_membership,
+        });
+        setShowEditModal(true);
+    };
+
+    const handleEditSubmit = (e) => {
+        e.preventDefault();
+        console.log("Edit user:", editForm);
+        setShowEditModal(false);
+        setSelectedUser(null);
+    };
+
+    const handleDeleteClick = (user) => {
+        setSelectedUser(user);
+        setShowDeleteModal(true);
+    };
+
+    const handleDeleteConfirm = () => {
+        console.log("Delete user:", selectedUser);
+        setShowDeleteModal(false);
+        setSelectedUser(null);
+    };
+
+    const getRoleBadgeColor = (role) => {
+        switch (role) {
+            case "admin":
+                return "bg-purple-100 text-purple-800";
+            case "operator":
+                return "bg-blue-100 text-blue-800";
+            default:
+                return "bg-gray-100 text-gray-800";
+        }
+    };
+
     return (
         <AdminLayout>
-            <main className="min-h-screen bg-gradient-to-br from-sky-100 to-blue-200 flex items-center justify-center">
-                <div className="bg-white rounded-2xl shadow-xl px-10 py-8 text-center">
-                    <h1 className="text-4xl font-extrabold text-blue-600 mb-2">
-                        Admin Kelola Pengguna
-                    </h1>
+            <main className="min-h-screen bg-gradient-to-br from-sky-50 to-blue-100 p-6">
+                <div className="max-w-7xl mx-auto">
+                    {/* Header */}
+                    <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="bg-gradient-to-br from-blue-500 via-cyan-500 to-emerald-500 p-3 rounded-xl shadow-lg ring-4 ring-white/30">
+                                    <IoPeopleOutline className="w-6 h-6 text-white" />
+                                </div>
+                                <div>
+                                    <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-cyan-600 to-emerald-600 bg-clip-text text-transparent">
+                                        Kelola Pengguna
+                                    </h1>
+                                    <p className="text-gray-600 text-sm">
+                                        Manajemen data pengguna sistem
+                                    </p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setShowAddModal(true)}
+                                className="group flex items-center gap-2 bg-gradient-to-br from-blue-500 via-cyan-500 to-emerald-500 hover:from-blue-600 hover:via-cyan-600 hover:to-emerald-600 text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl hover:scale-105 ring-2 ring-white/30"
+                            >
+                                <Plus className="w-5 h-5" />
+                                Tambah Pengguna
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Table */}
+                    <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-gradient-to-r from-blue-600 via-cyan-500 to-emerald-500 text-white relative">
+                                    <tr>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold">
+                                            No
+                                        </th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold">
+                                            Nama
+                                        </th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold">
+                                            Email
+                                        </th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold">
+                                            Role
+                                        </th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold">
+                                            Membership
+                                        </th>
+                                        <th className="px-6 py-4 text-center text-sm font-semibold">
+                                            Aksi
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-200">
+                                    {users.data.map((user, index) => (
+                                        <tr
+                                            key={user.id}
+                                            className="hover:bg-blue-50 transition-colors"
+                                        >
+                                            <td className="px-6 py-4 text-sm text-gray-700">
+                                                {users.from + index}
+                                            </td>
+                                            <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                                                {user.name}
+                                            </td>
+                                            <td className="px-6 py-4 text-sm text-gray-700">
+                                                {user.email}
+                                            </td>
+                                            <td className="px-6 py-4 text-sm">
+                                                <span
+                                                    className={`px-3 py-1 rounded-full text-xs font-semibold ${getRoleBadgeColor(
+                                                        user.role
+                                                    )}`}
+                                                >
+                                                    {user.role.toUpperCase()}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 text-sm">
+                                                <span
+                                                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                                                        user.is_membership
+                                                            ? "bg-green-100 text-green-800"
+                                                            : "bg-red-100 text-red-800"
+                                                    }`}
+                                                >
+                                                    {user.is_membership
+                                                        ? "Aktif"
+                                                        : "Tidak Aktif"}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 text-sm">
+                                                <div className="flex items-center justify-center gap-2">
+                                                    <button
+                                                        onClick={() =>
+                                                            handleEditClick(
+                                                                user
+                                                            )
+                                                        }
+                                                        className="p-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition-colors"
+                                                        title="Edit"
+                                                    >
+                                                        <Edit className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() =>
+                                                            handleDeleteClick(
+                                                                user
+                                                            )
+                                                        }
+                                                        className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+                                                        title="Hapus"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
+
+                {/* Modals */}
+                <AddUserModal
+                    isOpen={showAddModal}
+                    onClose={() => setShowAddModal(false)}
+                    form={addForm}
+                    setForm={setAddForm}
+                    onSubmit={handleAddSubmit}
+                />
+
+                <EditUserModal
+                    isOpen={showEditModal}
+                    onClose={() => setShowEditModal(false)}
+                    form={editForm}
+                    setForm={setEditForm}
+                    onSubmit={handleEditSubmit}
+                />
+
+                <DeleteUserModal
+                    isOpen={showDeleteModal}
+                    onClose={() => setShowDeleteModal(false)}
+                    user={selectedUser}
+                    onConfirm={handleDeleteConfirm}
+                />
+
+                {/* Modal Styles */}
+                <ModalStyles />
             </main>
         </AdminLayout>
     );

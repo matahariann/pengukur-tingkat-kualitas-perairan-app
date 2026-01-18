@@ -74,6 +74,9 @@ Route::middleware('auth')->group(function () {
 
         // Kelola Pengguna
         Route::get('/kelola-pengguna', [AdminKelolaPengguna::class, 'index'])->name('kelola-pengguna');
+        Route::post('/kelola-pengguna', [AdminKelolaPengguna::class, 'store'])->name('kelola-pengguna.store');
+        Route::put('/kelola-pengguna/{user}', [AdminKelolaPengguna::class, 'update'])->name('kelola-pengguna.update');
+        Route::delete('/kelola-pengguna/{user}', [AdminKelolaPengguna::class, 'destroy'])->name('kelola-pengguna.destroy');
 
         // Kelola Station
         Route::get('/kelola-station', [AdminKelolaStation::class, 'index'])->name('kelola-station');
