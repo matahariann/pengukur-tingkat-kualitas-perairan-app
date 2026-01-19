@@ -38,6 +38,30 @@ class StationSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            [
+                'id' => 4,
+                'id_type_water' => 1, // freshwater
+                'id_geo_zone' => 3,   // perairan darat
+                'id_user' => 2,       // operator
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'id' => 5,
+                'id_type_water' => 2, // freshwater
+                'id_geo_zone' => 2,   // perairan darat
+                'id_user' => 3,       // operator
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'id' => 6,
+                'id_type_water' => 1, // freshwater
+                'id_geo_zone' => 3,   // perairan darat
+                'id_user' => 4,       // operator
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ]);
     }
 }

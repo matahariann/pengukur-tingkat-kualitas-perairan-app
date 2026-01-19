@@ -16,19 +16,19 @@ class WaterTypeSeeder extends Seeder
         DB::table('water_types')->insert([
             [
                 'id' => 1,
-                'name' => 'freshwater',
+                'name' => 'Freshwater',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'id' => 2,
-                'name' => 'marine',
+                'name' => 'Marine',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'id' => 3,
-                'name' => 'brackish',
+                'name' => 'Brackish',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
