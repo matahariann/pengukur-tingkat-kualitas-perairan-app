@@ -143,17 +143,17 @@ export default function AquaLife() {
             <section 
                 id="home" 
                 className="relative pt-28 pb-16 px-4 sm:px-6 lg:px-8 bg-cover bg-center bg-no-repeat"
-                style={{ backgroundImage: "url('/background-cemebsa.jpg')" }}
+                style={{ backgroundImage: "url('/background.png')" }}
             >
-                <div className="absolute inset-0 bg-white/20"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30"></div>
                 <div className="max-w-7xl mx-auto relative z-10">
                     <div className="max-w-2xl py-12">
                         <div>
-                            <h1 className="text-4xl md:text-5xl font-bold text-blue-900 mb-6 leading-tight">
+                            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight drop-shadow-lg">
                                 Hitung Kualitas Air Budidaya Perikanan dengan
                                 Mudah dan Akurat
                             </h1>
-                            <p className="text-lg text-gray-600 mb-8">
+                            <p className="text-lg text-white/90 mb-8 drop-shadow-md">
                                 AquaLife membantu Anda menghitung dan menilai
                                 kualitas air budidaya berdasarkan parameter
                                 fisik-kimia, indeks biotik, dan keluarga biotik
