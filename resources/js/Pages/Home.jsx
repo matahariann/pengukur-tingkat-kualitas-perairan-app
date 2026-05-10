@@ -31,7 +31,12 @@ export default function AquaLife() {
                             <img
                                 src="Logo.png"
                                 alt="Logo"
-                                className="w-14 h-14"
+                                className="w-14 h-14 mr-4"
+                            />
+                            <img
+                                src="cemebsa-logo.png"
+                                alt="Cemebsa Logo"
+                                className="w-25 h-14"
                             />
                         </div>
 
@@ -135,9 +140,14 @@ export default function AquaLife() {
             </nav>
 
             {/* Hero Section */}
-            <section id="home" className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-7xl mx-auto">
-                    <div className="grid md:grid-cols-2 gap-12 items-center">
+            <section 
+                id="home" 
+                className="relative pt-28 pb-16 px-4 sm:px-6 lg:px-8 bg-cover bg-center bg-no-repeat"
+                style={{ backgroundImage: "url('/background-cemebsa.jpg')" }}
+            >
+                <div className="absolute inset-0 bg-white/20"></div>
+                <div className="max-w-7xl mx-auto relative z-10">
+                    <div className="max-w-2xl py-12">
                         <div>
                             <h1 className="text-4xl md:text-5xl font-bold text-blue-900 mb-6 leading-tight">
                                 Hitung Kualitas Air Budidaya Perikanan dengan
@@ -157,103 +167,6 @@ export default function AquaLife() {
                                 <span>Get Started</span>
                                 <ArrowRight className="w-5 h-5" />
                             </button>
-                        </div>
-
-                        <div className="relative h-96 flex items-center justify-center overflow-hidden bg-gradient-to-b from-sky-200 via-blue-100 to-blue-300 rounded-2xl shadow-lg">
-                            <svg
-                                className="w-full h-full"
-                                viewBox="0 0 1200 400"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <defs>
-                                    <linearGradient
-                                        id="oceanGradient"
-                                        x1="0%"
-                                        y1="0%"
-                                        x2="0%"
-                                        y2="100%"
-                                    >
-                                        <stop offset="0%" stopColor="#0ea5e9" />
-                                        <stop
-                                            offset="100%"
-                                            stopColor="#0284c7"
-                                        />
-                                    </linearGradient>
-                                </defs>
-
-                                {/* Wave Layer 1 - Back */}
-                                <path fill="#3b82f6" opacity="0.3">
-                                    <animate
-                                        attributeName="d"
-                                        dur="10s"
-                                        repeatCount="indefinite"
-                                        values="
-                      M0,250 Q150,200 300,250 T600,250 T900,250 T1200,250 L1200,400 L0,400 Z;
-                      M0,250 Q150,280 300,250 T600,250 T900,250 T1200,250 L1200,400 L0,400 Z;
-                      M0,250 Q150,200 300,250 T600,250 T900,250 T1200,250 L1200,400 L0,400 Z
-                    "
-                                    />
-                                </path>
-
-                                {/* Wave Layer 2 - Middle Back */}
-                                <path fill="#2563eb" opacity="0.5">
-                                    <animate
-                                        attributeName="d"
-                                        dur="8s"
-                                        repeatCount="indefinite"
-                                        values="
-                      M0,270 Q200,220 400,270 T800,270 T1200,270 L1200,400 L0,400 Z;
-                      M0,270 Q200,300 400,270 T800,270 T1200,270 L1200,400 L0,400 Z;
-                      M0,270 Q200,220 400,270 T800,270 T1200,270 L1200,400 L0,400 Z
-                    "
-                                    />
-                                </path>
-
-                                {/* Wave Layer 3 - Middle Front */}
-                                <path fill="#1e40af" opacity="0.7">
-                                    <animate
-                                        attributeName="d"
-                                        dur="6s"
-                                        repeatCount="indefinite"
-                                        values="
-                      M0,290 Q180,250 360,290 T720,290 T1080,290 L1200,400 L0,400 Z;
-                      M0,290 Q180,320 360,290 T720,290 T1080,290 L1200,400 L0,400 Z;
-                      M0,290 Q180,250 360,290 T720,290 T1080,290 L1200,400 L0,400 Z
-                    "
-                                    />
-                                </path>
-
-                                {/* Wave Layer 4 - Front */}
-                                <path fill="url(#oceanGradient)" opacity="0.9">
-                                    <animate
-                                        attributeName="d"
-                                        dur="5s"
-                                        repeatCount="indefinite"
-                                        values="
-                      M0,310 Q160,270 320,310 T640,310 T960,310 T1200,310 L1200,400 L0,400 Z;
-                      M0,310 Q160,340 320,310 T640,310 T960,310 T1200,310 L1200,400 L0,400 Z;
-                      M0,310 Q160,270 320,310 T640,310 T960,310 T1200,310 L1200,400 L0,400 Z
-                    "
-                                    />
-                                </path>
-
-                                {/* Wave highlights/foam on top */}
-                                <path
-                                    fill="rgba(255, 255, 255, 0.4)"
-                                    stroke="none"
-                                >
-                                    <animate
-                                        attributeName="d"
-                                        dur="5s"
-                                        repeatCount="indefinite"
-                                        values="
-                      M0,310 Q160,270 320,310 T640,310 T960,310 T1200,310 L1200,318 Q960,318 960,318 T640,318 T320,318 Q160,278 0,318 Z;
-                      M0,310 Q160,340 320,310 T640,310 T960,310 T1200,310 L1200,318 Q960,318 960,318 T640,318 T320,318 Q160,348 0,318 Z;
-                      M0,310 Q160,270 320,310 T640,310 T960,310 T1200,310 L1200,318 Q960,318 960,318 T640,318 T320,318 Q160,278 0,318 Z
-                    "
-                                    />
-                                </path>
-                            </svg>
                         </div>
                     </div>
                 </div>
