@@ -13,6 +13,7 @@ class Result extends Model
 
     protected $fillable = [
         'value',
+        'method',
         'status',
         'conclusion',
         'recommendation',

@@ -34,6 +34,7 @@ export default function AdminHitungKualitasAir({ geoZones, waterTypes, bioticFam
 
     const { data, setData, post, processing, errors } = useForm({
         // Station
+        method: initialData?.method || "WSM",
         id_history: initialData?.id_history || "",
         id_station: initialData?.id_station || "",
         name: initialData?.name || "",
@@ -320,15 +321,28 @@ bioticFamilies={bioticFamilies}
                                 </button>
 
                                 {currentStep === 3 ? (
-                                    <button
-                                        onClick={handleSubmit}
-                                        disabled={processing}
-                                        className="px-8 py-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-xl font-bold hover:shadow-lg hover:scale-105 transition-all flex items-center gap-2 disabled:opacity-70"
-                                    >
-                                        {processing ? "Menghitung..." : (
-                                            <>Hitung <FaSave /></>
-                                        )}
-                                    </button>
+                                    <div className="flex flex-col sm:flex-row items-end sm:items-center gap-4">
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-semibold text-gray-700">Metode:</span>
+                                            <select 
+                                                value={data.method}
+                                                onChange={(e) => setData('method', e.target.value)}
+                                                className="border border-gray-300 rounded-xl px-4 py-3 text-gray-700 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-400 min-w-[200px]"
+                                            >
+                                                <option value="WSM">Weighted Sum Model (WSM)</option>
+                                                <option value="SAW">Simple Additive Weighting (SAW)</option>
+                                            </select>
+                                        </div>
+                                        <button
+                                            onClick={handleSubmit}
+                                            disabled={processing}
+                                            className="px-8 py-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-xl font-bold hover:shadow-lg hover:scale-105 transition-all flex items-center gap-2 disabled:opacity-70"
+                                        >
+                                            {processing ? "Menghitung..." : (
+                                                <>Hitung <FaSave /></>
+                                            )}
+                                        </button>
+                                    </div>
                                 ) : (
                                     <button
                                         onClick={nextStep}

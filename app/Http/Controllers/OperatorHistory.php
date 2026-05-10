@@ -174,6 +174,7 @@ class OperatorHistory extends Controller
             'diversity' => $indexAdditional->diversity ?? '',
             'total_abundance' => $indexAdditional->total_abundance ?? '',
             'number_of_species' => $indexAdditional->number_of_species ?? '',
+            'method' => $result->method,
 
             'families' => $station->species->map(function($species) {
                 return [
@@ -249,9 +250,12 @@ class OperatorHistory extends Controller
         $isPreview = $request->query('is_preview') == 1 || $request->input('is_preview') == true;
 
         try {
-            // --- WSM Calculation ---
+            // --- Calculation ---
+            $method = $request->input('method', 'WSM');
             $totalScore = 0;
             $maxTotalScore = 0;
+            $sawSum = 0;
+            $parameterCount = 0;
 
             // 1. Calculate Main Abiotic
             $mainParams = [
@@ -286,9 +290,10 @@ class OperatorHistory extends Controller
                 $paramObj = (clone $query)->where('initial_value', '<=', $data['val'])
                     ->where('final_value', '>=', $data['val'])->first();
                 
-                if ($paramObj) {
-                   $totalScore += $paramObj->weight; 
-                }
+                $paramWeight = $paramObj ? $paramObj->weight : 0;
+                $totalScore += $paramWeight;
+                $sawSum += $maxW > 0 ? ($paramWeight / $maxW) : 0;
+                $parameterCount++;
             }
 
             // 2. Calculate Additional Abiotic
@@ -310,17 +315,19 @@ class OperatorHistory extends Controller
                 $val = $validated[$field];
                 $query = \App\Models\AdditionalAbioticParameter::where('name', $dbName);
                 
-                $maxTotalScore += (clone $query)->max('weight') ?? 3;
+                $maxW = (clone $query)->max('weight') ?? 3;
+                $maxTotalScore += $maxW;
 
                 $paramObj = (clone $query)->where('initial_value', '<=', $val)
                     ->where('final_value', '>=', $val)
                     ->first();
                 
-                if ($paramObj) {
-                    $totalScore += $paramObj->weight;
-                }
+                $paramWeight = $paramObj ? $paramObj->weight : 0;
+                $totalScore += $paramWeight;
+                $sawSum += $maxW > 0 ? ($paramWeight / $maxW) : 0;
+                $parameterCount++;
             }
-            
+
             // 3. Biotic Index
             $indexParams = [
                 'similarity' => 'Similarity',
@@ -329,23 +336,25 @@ class OperatorHistory extends Controller
                 'total_abundance' => 'Total Abundance',
                 'number_of_species' => 'Number of Species',
             ];
-            
+
             foreach ($indexParams as $field => $dbName) {
                 if (!isset($validated[$field])) continue;
                 $val = $validated[$field];
                 $query = \App\Models\BioticIndexParameter::where('name', $dbName);
                 
-                $maxTotalScore += (clone $query)->max('weight') ?? 3;
+                $maxW = (clone $query)->max('weight') ?? 3;
+                $maxTotalScore += $maxW;
 
                 $paramObj = (clone $query)->where('initial_value', '<=', $val)
                     ->where('final_value', '>=', $val)
                     ->first();
                 
-                if ($paramObj) {
-                    $totalScore += $paramObj->weight;
-                }
+                $paramWeight = $paramObj ? $paramObj->weight : 0;
+                $totalScore += $paramWeight;
+                $sawSum += $maxW > 0 ? ($paramWeight / $maxW) : 0;
+                $parameterCount++;
             }
-            
+
             // 4. Family Biotic
             if (!empty($validated['families'])) {
                 foreach ($validated['families'] as $fam) {
@@ -354,21 +363,34 @@ class OperatorHistory extends Controller
                     $familyObj = \App\Models\BioticFamily::find($fam['id_family']);
                     if ($familyObj) {
                         $abundance = $fam['abundance'] ?? 1;
+                        $taxa = $fam['taxa_indicator'] ?? 1;
+
                         $normalized = log($abundance + 1);
 
-                        $totalScore += $familyObj->weight * $normalized;
+                        $paramWeight = $familyObj->weight * $taxa * $normalized;
+                        $totalScore += $paramWeight;
 
-                        $maxAbundance = 1000; 
+                        $maxAbundance = 1000;
                         $maxNormalized = log($maxAbundance + 1);
 
-                        $maxTotalScore += $familyObj->weight * $maxNormalized;
+                        $maxTaxa = 10;
+                        $maxW = $familyObj->weight * $maxTaxa * $maxNormalized;
+
+                        $maxTotalScore += $maxW;
+                        $sawSum += $maxW > 0 ? ($paramWeight / $maxW) : 0;
+                        $parameterCount++;
                     }
                 }
             }
 
             // Determine Status
-            if ($maxTotalScore == 0) $maxTotalScore = 1;
-            $finalValue = round(($totalScore / $maxTotalScore) * 100, 2);
+            if ($method === 'SAW') {
+                if ($parameterCount == 0) $parameterCount = 1;
+                $finalValue = round(($sawSum / $parameterCount) * 100, 2);
+            } else {
+                if ($maxTotalScore == 0) $maxTotalScore = 1;
+                $finalValue = round(($totalScore / $maxTotalScore) * 100, 2);
+            }
 
             $status = $this->getStatus($finalValue);
             $conclusion = $this->getConclusion($status);
@@ -376,7 +398,8 @@ class OperatorHistory extends Controller
 
             if ($isPreview) {
                 return redirect()->back()->with('preview_result', [
-                    'value' => $finalValue,
+                    'method' => $method,
+                'value' => $finalValue,
                     'status' => $status,
                     'conclusion' => $conclusion,
                     'recommendation' => $recommendation,
@@ -390,6 +413,7 @@ class OperatorHistory extends Controller
             
             $result = \App\Models\Result::findOrFail($id);
             $result->update([
+                'method' => $method,
                 'value' => $finalValue,
                 'status' => $status,
                 'conclusion' => $conclusion,

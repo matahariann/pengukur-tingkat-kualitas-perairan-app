@@ -134,9 +134,12 @@ class AdminHitungKualitasAir extends Controller
             }
         } // Close if (!$isPreview)
 
-        // --- WSM Calculation ---
+        // --- Calculation ---
+        $method = $request->input('method', 'WSM');
         $totalScore = 0;
         $maxTotalScore = 0;
+        $sawSum = 0;
+        $parameterCount = 0;
 
         // 1. Calculate Main Abiotic
             $mainParams = [
@@ -172,9 +175,10 @@ class AdminHitungKualitasAir extends Controller
                 $paramObj = (clone $query)->where('initial_value', '<=', $data['val'])
                     ->where('final_value', '>=', $data['val'])->first();
                 
-                if ($paramObj) {
-                   $totalScore += $paramObj->weight; 
-                }
+                $paramWeight = $paramObj ? $paramObj->weight : 0;
+                $totalScore += $paramWeight;
+                $sawSum += $maxW > 0 ? ($paramWeight / $maxW) : 0;
+                $parameterCount++;
             }
 
             // 2. Calculate Additional Abiotic (Generic names)
@@ -196,15 +200,17 @@ class AdminHitungKualitasAir extends Controller
                 $val = $validated[$field];
                 $query = \App\Models\AdditionalAbioticParameter::where('name', $dbName);
                 
-                $maxTotalScore += (clone $query)->max('weight') ?? 3;
+                $maxW = (clone $query)->max('weight') ?? 3;
+                $maxTotalScore += $maxW;
 
                 $paramObj = (clone $query)->where('initial_value', '<=', $val)
                     ->where('final_value', '>=', $val)
                     ->first();
                 
-                if ($paramObj) {
-                    $totalScore += $paramObj->weight;
-                }
+                $paramWeight = $paramObj ? $paramObj->weight : 0;
+                $totalScore += $paramWeight;
+                $sawSum += $maxW > 0 ? ($paramWeight / $maxW) : 0;
+                $parameterCount++;
             }
             
             // 3. Biotic Index
@@ -221,15 +227,17 @@ class AdminHitungKualitasAir extends Controller
                 $val = $validated[$field];
                 $query = \App\Models\BioticIndexParameter::where('name', $dbName);
                 
-                $maxTotalScore += (clone $query)->max('weight') ?? 3;
+                $maxW = (clone $query)->max('weight') ?? 3;
+                $maxTotalScore += $maxW;
 
                 $paramObj = (clone $query)->where('initial_value', '<=', $val)
                     ->where('final_value', '>=', $val)
                     ->first();
                 
-                if ($paramObj) {
-                    $totalScore += $paramObj->weight;
-                }
+                $paramWeight = $paramObj ? $paramObj->weight : 0;
+                $totalScore += $paramWeight;
+                $sawSum += $maxW > 0 ? ($paramWeight / $maxW) : 0;
+                $parameterCount++;
             }
             
             // 4. Family Biotic
@@ -244,21 +252,29 @@ class AdminHitungKualitasAir extends Controller
 
                         $normalized = log($abundance + 1);
 
-                        $totalScore += $familyObj->weight * $taxa * $normalized;
+                        $paramWeight = $familyObj->weight * $taxa * $normalized;
+                        $totalScore += $paramWeight;
 
                         $maxAbundance = 1000;
                         $maxNormalized = log($maxAbundance + 1);
-
                         $maxTaxa = 10;
+                        $maxW = $familyObj->weight * $maxTaxa * $maxNormalized;
+                        $maxTotalScore += $maxW;
 
-                        $maxTotalScore += $familyObj->weight * $maxTaxa * $maxNormalized;
+                        $sawSum += $maxW > 0 ? ($paramWeight / $maxW) : 0;
+                        $parameterCount++;
                     }
                 }
             }
 
-            // Determine Status (WSM Normalization)
-            if ($maxTotalScore == 0) $maxTotalScore = 1;
-            $finalValue = round(($totalScore / $maxTotalScore) * 100, 2);
+            // Determine Status (WSM or SAW Normalization)
+            if ($method === 'SAW') {
+                if ($parameterCount == 0) $parameterCount = 1;
+                $finalValue = round(($sawSum / $parameterCount) * 100, 2);
+            } else {
+                if ($maxTotalScore == 0) $maxTotalScore = 1;
+                $finalValue = round(($totalScore / $maxTotalScore) * 100, 2);
+            }
 
             $status = $this->getStatus($finalValue);
             $conclusion = $this->getConclusion($status);
@@ -266,6 +282,7 @@ class AdminHitungKualitasAir extends Controller
 
             if ($isPreview) {
                 return redirect()->back()->with('preview_result', [
+                    'method' => $method,
                     'value' => $finalValue,
                     'status' => $status,
                     'conclusion' => $conclusion,
@@ -280,7 +297,8 @@ class AdminHitungKualitasAir extends Controller
                 $result = \App\Models\Result::find($validated['id_history']);
                 if ($result) {
                     $result->update([
-                        'value' => $finalValue,
+                        'method' => $method,
+                    'value' => $finalValue,
                         'status' => $status,
                         'conclusion' => $conclusion,
                         'recommendation' => $recommendation,
@@ -349,6 +367,7 @@ class AdminHitungKualitasAir extends Controller
                 }
             } else {
                 $result = \App\Models\Result::create([
+                    'method' => $method,
                     'value' => $finalValue,
                     'status' => $status,
                     'conclusion' => $conclusion,

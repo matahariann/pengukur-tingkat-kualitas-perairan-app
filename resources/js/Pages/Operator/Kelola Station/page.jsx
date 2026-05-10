@@ -140,6 +140,7 @@ export default function OperatorKelolaStation({ histories }) {
                                         <th className="px-6 py-4 text-left text-sm font-semibold whitespace-nowrap">Station</th>
                                         <th className="px-6 py-4 text-left text-sm font-semibold whitespace-nowrap">Geographical Zone</th>
                                         <th className="px-6 py-4 text-left text-sm font-semibold whitespace-nowrap">Type of Location</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold whitespace-nowrap">Method</th>
                                         <th className="px-6 py-4 text-left text-sm font-semibold whitespace-nowrap">Value</th>
                                         <th className="px-6 py-4 text-left text-sm font-semibold whitespace-nowrap">Status</th>
                                         <th className="px-6 py-4 text-center text-sm font-semibold whitespace-nowrap">Action</th>
@@ -163,6 +164,9 @@ export default function OperatorKelolaStation({ histories }) {
                                                 </td>
                                                 <td className="px-6 py-4 text-sm text-gray-700">
                                                     {history.station?.water_type?.name || '-'}
+                                                </td>
+                                                <td className="px-6 py-4 text-sm font-medium text-blue-700 bg-blue-50/50">
+                                                    {history.method || 'WSM'}
                                                 </td>
                                                 <td className="px-6 py-4 text-sm text-gray-700">
                                                     {history.value}

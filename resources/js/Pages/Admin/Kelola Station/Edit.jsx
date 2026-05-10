@@ -30,40 +30,41 @@ export default function AdminKelolaStationEdit({ geoZones, waterTypes, bioticFam
 
     const { data, setData, put, processing, errors } = useForm({
         // Station
-        id_history: initialData?.id_history || "",
-        id_station: initialData?.id_station || "",
-        name: initialData?.name || "",
-        id_geo_zone: initialData?.id_geo_zone || "",
-        id_type_water: initialData?.id_type_water || "",
+        method: initialData?.method ?? "WSM",
+        id_history: initialData?.id_history ?? "",
+        id_station: initialData?.id_station ?? "",
+        name: initialData?.name ?? "",
+        id_geo_zone: initialData?.id_geo_zone ?? "",
+        id_type_water: initialData?.id_type_water ?? "",
         
         // Main Abiotic
-        ph: initialData?.ph || "",
-        temperature: initialData?.temperature || "",
-        dissolved_oxygen: initialData?.dissolved_oxygen || "",
-        salinity: initialData?.salinity || "",
-        nh3: initialData?.nh3 || "",
-        nh2: initialData?.nh2 || "",
-        ammonia: initialData?.ammonia || "",
+        ph: initialData?.ph ?? "",
+        temperature: initialData?.temperature ?? "",
+        dissolved_oxygen: initialData?.dissolved_oxygen ?? "",
+        salinity: initialData?.salinity ?? "",
+        nh3: initialData?.nh3 ?? "",
+        nh2: initialData?.nh2 ?? "",
+        ammonia: initialData?.ammonia ?? "",
 
         // Main Biotic (Dynamic)
         families: initialData?.families || [], 
 
         // Additional Abiotic
-        conductivity: initialData?.conductivity || "",
-        ratio_cn: initialData?.ratio_cn || "",
-        turbidity: initialData?.turbidity || "",
-        clay: initialData?.clay || "",
-        sand: initialData?.sand || "",
-        silt: initialData?.silt || "",
-        coarse_sediment: initialData?.coarse_sediment || "",
-        total_organic_dissolved: initialData?.total_organic_dissolved || "",
-        total_organic_substrate: initialData?.total_organic_substrate || "",
-        macrozoobenthos_density: initialData?.macrozoobenthos_density || "",
+        conductivity: initialData?.conductivity ?? "",
+        ratio_cn: initialData?.ratio_cn ?? "",
+        turbidity: initialData?.turbidity ?? "",
+        clay: initialData?.clay ?? "",
+        sand: initialData?.sand ?? "",
+        silt: initialData?.silt ?? "",
+        coarse_sediment: initialData?.coarse_sediment ?? "",
+        total_organic_dissolved: initialData?.total_organic_dissolved ?? "",
+        total_organic_substrate: initialData?.total_organic_substrate ?? "",
+        macrozoobenthos_density: initialData?.macrozoobenthos_density ?? "",
 
         // Biotic Index
-        similarity: initialData?.similarity || "",
-        dominance: initialData?.dominance || "",
-        diversity: initialData?.diversity || "",
+        similarity: initialData?.similarity ?? "",
+        dominance: initialData?.dominance ?? "",
+        diversity: initialData?.diversity ?? "",
         total_abundance: initialData?.total_abundance || 0,
         number_of_species: initialData?.number_of_species || 0,
     });
@@ -327,15 +328,28 @@ bioticFamilies={bioticFamilies}
                                 </button>
 
                                 {currentStep === 3 ? (
-                                    <button
-                                        onClick={handleSubmit}
-                                        disabled={processing}
-                                        className="px-8 py-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-xl font-bold hover:shadow-lg hover:scale-105 transition-all flex items-center gap-2 disabled:opacity-70"
-                                    >
-                                        {processing ? "Menghitung..." : (
-                                            <>Hitung <FaSave /></>
-                                        )}
-                                    </button>
+                                    <div className="flex flex-col sm:flex-row items-end sm:items-center gap-4">
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-semibold text-gray-700">Metode:</span>
+                                            <select 
+                                                value={data.method}
+                                                onChange={(e) => setData('method', e.target.value)}
+                                                className="border border-gray-300 rounded-xl px-4 py-3 text-gray-700 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-400 min-w-[200px]"
+                                            >
+                                                <option value="WSM">Weighted Sum Model (WSM)</option>
+                                                <option value="SAW">Simple Additive Weighting (SAW)</option>
+                                            </select>
+                                        </div>
+                                        <button
+                                            onClick={handleSubmit}
+                                            disabled={processing}
+                                            className="px-8 py-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-xl font-bold hover:shadow-lg hover:scale-105 transition-all flex items-center gap-2 disabled:opacity-70"
+                                        >
+                                            {processing ? "Menghitung..." : (
+                                                <>Hitung <FaSave /></>
+                                            )}
+                                        </button>
+                                    </div>
                                 ) : (
                                     <button
                                         onClick={nextStep}

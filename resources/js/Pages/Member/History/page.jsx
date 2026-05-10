@@ -156,6 +156,7 @@ export default function MemberHistory({ histories, auth }) {
                                         <th className="px-6 py-4 text-left text-sm font-semibold whitespace-nowrap">Station</th>
                                         <th className="px-6 py-4 text-left text-sm font-semibold whitespace-nowrap">Geographical Zone</th>
                                         <th className="px-6 py-4 text-left text-sm font-semibold whitespace-nowrap">Type of Location</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold whitespace-nowrap">Method</th>
                                         <th className="px-6 py-4 text-left text-sm font-semibold whitespace-nowrap">Value</th>
                                         <th className="px-6 py-4 text-left text-sm font-semibold whitespace-nowrap">Status</th>
                                         <th className="px-6 py-4 text-center text-sm font-semibold whitespace-nowrap">Action</th>
@@ -176,6 +177,9 @@ export default function MemberHistory({ histories, auth }) {
                                                 </td>
                                                 <td className="px-6 py-4 text-sm text-gray-700">
                                                     {history.station?.water_type?.name || '-'}
+                                                </td>
+                                                <td className="px-6 py-4 text-sm font-medium text-blue-700 bg-blue-50/50">
+                                                    {history.method || 'WSM'}
                                                 </td>
                                                 <td className="px-6 py-4 text-sm text-gray-700">
                                                     {history.value}
@@ -221,7 +225,7 @@ export default function MemberHistory({ histories, auth }) {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
+                                            <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
                                                 Tidak ada data histori perhitungan.
                                             </td>
                                         </tr>
