@@ -204,9 +204,22 @@ export default function MemberPembayaran({ auth, payments }) {
         });
     };
 
-    // Listen for snapToken from backend flash data
+    // Listen for flash messages from backend
     useEffect(() => {
         console.log("Current Flash data:", flash);
+
+        if (flash?.success) {
+            toast.success(flash.success);
+        }
+
+        if (flash?.error) {
+            toast.error(flash.error);
+        }
+
+        if (flash?.info) {
+            toast.info(flash.info);
+        }
+
         if (flash?.snapToken) {
             console.log("Detected snapToken in flash data:", flash.snapToken);
             triggerSnap(flash.snapToken);

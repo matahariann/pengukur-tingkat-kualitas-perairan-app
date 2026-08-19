@@ -26,6 +26,8 @@ class DatabaseSeeder extends Seeder
             AdditionalAbioticParameterSeeder::class,
             BioticIndexParameterSeeder::class,
             ResultSeeder::class,
+            FeedingTypeSeeder::class,
+            RecommendationSeeder::class,
         ]);
     }
 }

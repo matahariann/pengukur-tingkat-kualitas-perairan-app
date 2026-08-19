@@ -22,12 +22,14 @@ class MidtransWebhookController extends Controller
         $transactionStatus = $payload['transaction_status'] ?? '';
 
         $serverKey = config('midtrans.server_key');
+        Log::info('Midtrans Webhook Server Key Preview: ' . substr($serverKey ?? '', 0, 8));
         
         // Verifikasi Signature
         $calculatedSignature = hash('sha512', $orderId . $statusCode . $grossAmount . $serverKey);
 
         if ($calculatedSignature !== $signatureKey) {
             Log::warning('Midtrans Webhook Signature Mismatch: ', $payload);
+            Log::warning('Calculated signature: ' . $calculatedSignature . ' | Provided: ' . $signatureKey);
             return response()->json(['message' => 'Invalid signature'], 403);
         }
 

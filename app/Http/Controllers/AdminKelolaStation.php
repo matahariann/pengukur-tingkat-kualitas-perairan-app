@@ -6,6 +6,7 @@ use App\Models\Station;
 use App\Models\User;
 use App\Models\WaterType;
 use App\Models\GeoZone;
+use App\Models\Recommendation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -25,10 +26,48 @@ class AdminKelolaStation extends Controller
         if (!in_array($perPage, $allowedPerPage)) {
             $perPage = 10;
         }
-    
-        // Ambil data history semua user dengan pagination
-        $histories = \App\Models\Result::with(['station.geoZone', 'station.waterType', 'user'])
-            ->orderBy('created_at', 'desc')
+
+        // Build query dengan search & filter
+        $query = \App\Models\Result::with(['station.geoZone', 'station.waterType', 'user']);
+
+        // Search: nama stasiun, nama pengguna, email pengguna
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('station', function ($sq) use ($search) {
+                    $sq->where('name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('user', function ($uq) use ($search) {
+                    $uq->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        // Filter: zona geografis
+        if ($geoZone = $request->input('geo_zone')) {
+            $query->whereHas('station', function ($q) use ($geoZone) {
+                $q->where('id_geo_zone', $geoZone);
+            });
+        }
+
+        // Filter: tipe air
+        if ($waterType = $request->input('water_type')) {
+            $query->whereHas('station', function ($q) use ($waterType) {
+                $q->where('id_type_water', $waterType);
+            });
+        }
+
+        // Filter: status kualitas
+        if ($status = $request->input('status')) {
+            $query->where('status', $status);
+        }
+
+        // Filter: metode kalkulasi
+        if ($method = $request->input('method')) {
+            $query->where('method', $method);
+        }
+
+        $histories = $query->orderBy('created_at', 'desc')
             ->paginate($perPage)
             ->withQueryString();
         
@@ -43,7 +82,16 @@ class AdminKelolaStation extends Controller
                     'membership' => $user->is_membership,
                 ]
             ],
-            'histories' => $histories
+            'histories' => $histories,
+            'geoZones' => GeoZone::orderBy('name')->get(['id', 'name']),
+            'waterTypes' => WaterType::orderBy('name')->get(['id', 'name']),
+            'filters' => [
+                'search' => $request->input('search', ''),
+                'geo_zone' => $request->input('geo_zone', ''),
+                'water_type' => $request->input('water_type', ''),
+                'status' => $request->input('status', ''),
+                'method' => $request->input('method', ''),
+            ],
         ]);
     }
 
@@ -162,6 +210,8 @@ class AdminKelolaStation extends Controller
                     'name' => $species->name ?? 'Unknown',
                     'abundance' => $species->abundance,
                     'taxa_indicator' => $species->taxa_indicator,
+                    'feeding_type' => $species->feeding_type,
+                    'feeding_type_weight' => $species->feeding_type_weight,
                 ];
             })->toArray(),
         ];
@@ -244,6 +294,8 @@ class AdminKelolaStation extends Controller
                     'name' => $species->name ?? 'Unknown',
                     'abundance' => $species->abundance,
                     'taxa_indicator' => $species->taxa_indicator,
+                    'feeding_type' => $species->feeding_type,
+                    'feeding_type_weight' => $species->feeding_type_weight,
                 ];
             })->toArray(),
         ];
@@ -261,6 +313,7 @@ class AdminKelolaStation extends Controller
             'geoZones' => \App\Models\GeoZone::all(),
             'waterTypes' => \App\Models\WaterType::all(),
             'bioticFamilies' => \App\Models\BioticFamily::all(),
+            'feedingTypes' => \App\Models\FeedingType::all(),
             'initialData' => $initialData
         ]);
     }
@@ -307,6 +360,8 @@ class AdminKelolaStation extends Controller
             'families.*.name' => 'nullable|string',
             'families.*.abundance' => 'nullable|numeric',
             'families.*.taxa_indicator' => 'nullable|numeric',
+            'families.*.feeding_type' => 'nullable|string',
+            'families.*.feeding_type_weight' => 'nullable|numeric',
         ]);
 
         $isPreview = $request->query('is_preview') == 1 || $request->input('is_preview') == true;
@@ -425,18 +480,18 @@ class AdminKelolaStation extends Controller
                     $familyObj = \App\Models\BioticFamily::find($fam['id_family']);
                     if ($familyObj) {
                         $abundance = $fam['abundance'] ?? 1;
-                        $taxa = $fam['taxa_indicator'] ?? 1;
+                        $feedingTypeWeight = $fam['feeding_type_weight'] ?? 1;
 
                         $normalized = log($abundance + 1);
 
-                        $paramWeight = $familyObj->weight * $taxa * $normalized;
+                        $paramWeight = $familyObj->weight * $feedingTypeWeight * $normalized;
                         $totalScore += $paramWeight;
 
                         $maxAbundance = 1000;
                         $maxNormalized = log($maxAbundance + 1);
 
-                        $maxTaxa = 10;
-                        $maxW = $familyObj->weight * $maxTaxa * $maxNormalized;
+                        $maxFeedingWeight = \App\Models\FeedingType::max('weight') ?? 7;
+                        $maxW = $familyObj->weight * $maxFeedingWeight * $maxNormalized;
 
                         $maxTotalScore += $maxW;
                         $sawSum += $maxW > 0 ? ($paramWeight / $maxW) : 0;
@@ -535,6 +590,8 @@ class AdminKelolaStation extends Controller
                         'name' => $fam['name'] ?? 'Unknown', 
                         'abundance' => $fam['abundance'] ?? 0,
                         'taxa_indicator' => $fam['taxa_indicator'] ?? 0,
+                        'feeding_type' => $fam['feeding_type'] ?? null,
+                        'feeding_type_weight' => $fam['feeding_type_weight'] ?? null,
                     ]);
                 }
             }
@@ -562,23 +619,11 @@ class AdminKelolaStation extends Controller
     
     private function getConclusion($status)
     {
-        return match($status) {
-            'Undisturbed Areas' => 'Water environment condition is healty, within normal range and undisturbed (Undisturbed Areas)',
-            'Lightly Disturbed Areas' => 'Water environment condition is healty, within normal range and lightly disturbed (Lightly Disturbed Areas)',
-            'Moderately Disturbed Areas' => 'Water environment condition is moderately disturbed (Moderately Disturbed Areas)',
-            'Heavily Disturbed Areas' => 'Water environment condition is heavily disturbed (Heavily Disturbed Areas)',
-            default => '-'
-        };
+        return Recommendation::where('status', $status)->value('conclusion') ?? '-';
     }
     
     private function getRecommendation($status)
     {
-        return match($status) {
-            'Undisturbed Areas' => 'Keep the carrying capacity environment (environmental carrying capacity) under normal/stable conditions (equilibrium)',
-            'Lightly Disturbed Areas' => 'Perform monitoring and control of pollution sources to prevent quality degradation',
-            'Moderately Disturbed Areas' => 'Management and mitigation actions are needed to improve water conditions',
-            'Heavily Disturbed Areas' => 'Immediately identify and handle the main pollution sources',
-            default => '-'
-        };
+        return Recommendation::where('status', $status)->value('recommendation') ?? '-';
     }
 }

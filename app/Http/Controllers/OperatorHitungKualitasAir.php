@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Recommendation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -27,6 +28,7 @@ class OperatorHitungKualitasAir extends Controller
             'geoZones' => \App\Models\GeoZone::all(),
             'waterTypes' => \App\Models\WaterType::all(),
             'bioticFamilies' => \App\Models\BioticFamily::all(),
+            'feedingTypes' => \App\Models\FeedingType::all(),
         ]);
     }
 
@@ -70,15 +72,19 @@ class OperatorHitungKualitasAir extends Controller
             'families.*.name' => 'nullable|string',
             'families.*.abundance' => 'nullable|numeric',
             'families.*.taxa_indicator' => 'nullable|numeric',
+            'families.*.feeding_type' => 'nullable|string',
+            'families.*.feeding_type_weight' => 'nullable|numeric',
         ]);
 
         $isPreview = $request->query('is_preview') == 1 || $request->input('is_preview') == true;
         $isUpdate = !empty($validated['id_history']);
 
         try {
-            if (!$isPreview && !$isUpdate) {
+            if (!$isPreview) {
                 DB::beginTransaction();
-                
+            }
+
+            if (!$isPreview && !$isUpdate) {
                 // Create Station
                 $station = \App\Models\Station::create([
                     'name' => $validated['name'],
@@ -130,6 +136,8 @@ class OperatorHitungKualitasAir extends Controller
                         'name' => $fam['name'] ?? 'Unknown', 
                         'abundance' => $fam['abundance'] ?? 0,
                         'taxa_indicator' => $fam['taxa_indicator'] ?? 0,
+                        'feeding_type' => $fam['feeding_type'] ?? null,
+                        'feeding_type_weight' => $fam['feeding_type_weight'] ?? null,
                     ]);
                 }
             }
@@ -249,17 +257,17 @@ class OperatorHitungKualitasAir extends Controller
                     $familyObj = \App\Models\BioticFamily::find($fam['id_family']);
                     if ($familyObj) {
                         $abundance = $fam['abundance'] ?? 1;
-                        $taxa = $fam['taxa_indicator'] ?? 1;
+                        $feedingTypeWeight = $fam['feeding_type_weight'] ?? 1;
 
                         $normalized = log($abundance + 1);
 
-                        $paramWeight = $familyObj->weight * $taxa * $normalized;
+                        $paramWeight = $familyObj->weight * $feedingTypeWeight * $normalized;
                         $totalScore += $paramWeight;
 
                         $maxAbundance = 1000;
                         $maxNormalized = log($maxAbundance + 1);
-                        $maxTaxa = 10;
-                        $maxW = $familyObj->weight * $maxTaxa * $maxNormalized;
+                        $maxFeedingWeight = \App\Models\FeedingType::max('weight') ?? 7;
+                        $maxW = $familyObj->weight * $maxFeedingWeight * $maxNormalized;
                         $maxTotalScore += $maxW;
 
                         $sawSum += $maxW > 0 ? ($paramWeight / $maxW) : 0;
@@ -362,6 +370,8 @@ class OperatorHitungKualitasAir extends Controller
                                 'name' => $fam['name'] ?? 'Unknown', 
                                 'abundance' => $fam['abundance'] ?? 0,
                                 'taxa_indicator' => $fam['taxa_indicator'] ?? 0,
+                                'feeding_type' => $fam['feeding_type'] ?? null,
+                                'feeding_type_weight' => $fam['feeding_type_weight'] ?? null,
                             ]);
                         }
                     }
@@ -378,7 +388,7 @@ class OperatorHitungKualitasAir extends Controller
                 ]);
             }
 
-            if (!$isUpdate) {
+            if (!$isPreview) {
                 DB::commit();
             }
 
@@ -402,23 +412,11 @@ class OperatorHitungKualitasAir extends Controller
     
     private function getConclusion($status)
     {
-        return match($status) {
-            'Undisturbed Areas' => 'Water environment condition is healty, within normal range and undisturbed (Undisturbed Areas)',
-            'Lightly Disturbed Areas' => 'Water environment condition is healty, within normal range and lightly disturbed (Lightly Disturbed Areas)',
-            'Moderately Disturbed Areas' => 'Water environment condition is moderately disturbed (Moderately Disturbed Areas)',
-            'Heavily Disturbed Areas' => 'Water environment condition is heavily disturbed (Heavily Disturbed Areas)',
-            default => '-'
-        };
+        return Recommendation::where('status', $status)->value('conclusion') ?? '-';
     }
     
     private function getRecommendation($status)
     {
-        return match($status) {
-            'Undisturbed Areas' => 'Keep the carrying capacity environment (environmental carrying capacity) under normal/stable conditions (equilibrium)',
-            'Lightly Disturbed Areas' => 'Perform monitoring and control of pollution sources to prevent quality degradation',
-            'Moderately Disturbed Areas' => 'Management and mitigation actions are needed to improve water conditions',
-            'Heavily Disturbed Areas' => 'Immediately identify and handle the main pollution sources',
-            default => '-'
-        };
+        return Recommendation::where('status', $status)->value('recommendation') ?? '-';
     }
 }

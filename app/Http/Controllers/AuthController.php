@@ -49,7 +49,7 @@ class AuthController extends Controller
             Session::flash('success', 'Registrasi berhasil! Selamat datang di AquaLife.');
 
             // Redirect ke halaman member history
-            return redirect()->route('Login');
+            return redirect()->route('login');
 
         } catch (\Exception $e) {
             // Flash message error

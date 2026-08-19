@@ -17,6 +17,10 @@ import DeleteBioticIndexModal from "@/Components/DeleteBioticIndexModal";
 import AddFamilyBioticModal from "@/Components/AddFamilyBioticModal";
 import EditFamilyBioticModal from "@/Components/EditFamilyBioticModal";
 import DeleteFamilyBioticModal from "@/Components/DeleteFamilyBioticModal";
+import AddFeedingTypeModal from "@/Components/AddFeedingTypeModal";
+import EditFeedingTypeModal from "@/Components/EditFeedingTypeModal";
+import DeleteFeedingTypeModal from "@/Components/DeleteFeedingTypeModal";
+import EditRecommendationModal from "@/Components/EditRecommendationModal";
 
 
 
@@ -30,6 +34,8 @@ export default function AdminKelolaBobot({
     additionalAbioticParameters,
     bioticIndexParameters,
     bioticFamilies,
+    feedingTypes,
+    recommendations,
     geoZones,
     waterTypes,
 }) {
@@ -59,6 +65,18 @@ export default function AdminKelolaBobot({
                     title: "Bobot Family Biotic",
                     desc: "Konten khusus untuk bobot family biotic.",
                     color: "from-cyan-500 to-emerald-500",
+                };
+            case "feeding-type":
+                return {
+                    title: "Bobot Feeding Type",
+                    desc: "Konten khusus untuk bobot feeding type.",
+                    color: "from-sky-500 to-indigo-500",
+                };
+            case "recommendation":
+                return {
+                    title: "Rekomendasi & Kesimpulan",
+                    desc: "Kelola teks kesimpulan dan rekomendasi berdasarkan status kualitas air.",
+                    color: "from-amber-500 to-orange-500",
                 };
             case "main-abiotic":
             default:
@@ -174,6 +192,30 @@ export default function AdminKelolaBobot({
         bioticFamilies?.per_page || 10
     );
 
+    // Feeding Type state (CRUD)
+    const [showAddFeedingModal, setShowAddFeedingModal] = useState(false);
+    const [showEditFeedingModal, setShowEditFeedingModal] = useState(false);
+    const [showDeleteFeedingModal, setShowDeleteFeedingModal] = useState(false);
+    const [selectedFeedingParam, setSelectedFeedingParam] = useState(null);
+    const [addFeedingErrors, setAddFeedingErrors] = useState({});
+    const [editFeedingErrors, setEditFeedingErrors] = useState({});
+
+    const [addFeedingForm, setAddFeedingForm] = useState({
+        code: "",
+        name: "",
+        weight: "",
+    });
+
+    const [editFeedingForm, setEditFeedingForm] = useState({
+        code: "",
+        name: "",
+        weight: "",
+    });
+
+    const [perPageFeeding, setPerPageFeeding] = useState(
+        feedingTypes?.per_page || 10
+    );
+
     useEffect(() => {
         if (mainAbioticParameters?.per_page) {
             setPerPageMain(mainAbioticParameters.per_page);
@@ -197,6 +239,12 @@ export default function AdminKelolaBobot({
             setPerPageFamily(bioticFamilies.per_page);
         }
     }, [bioticFamilies?.per_page]);
+
+    useEffect(() => {
+        if (feedingTypes?.per_page) {
+            setPerPageFeeding(feedingTypes.per_page);
+        }
+    }, [feedingTypes?.per_page]);
 
     const handlePerPageChangeMain = (value) => {
         const newPerPage = Number(value);
@@ -871,6 +919,222 @@ export default function AdminKelolaBobot({
         return pages;
     };
 
+    const handlePerPageChangeFeeding = (value) => {
+        const newPerPage = Number(value);
+        setPerPageFeeding(newPerPage);
+        router.get(
+            "/admin/kelola-bobot",
+            { per_page: newPerPage, tab: "feeding-type" },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+            }
+        );
+    };
+
+    const handlePageChangeFeeding = (pageUrl) => {
+        if (!pageUrl) return;
+        const urlObj = new URL(pageUrl, window.location.origin);
+        urlObj.searchParams.set("per_page", perPageFeeding);
+        urlObj.searchParams.set("tab", "feeding-type");
+        router.get(urlObj.pathname + urlObj.search, {}, {
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+        });
+    };
+
+    const renderPageNumbersFeeding = () => {
+        const pages = [];
+        const currentPage = feedingTypes?.current_page || 1;
+        const lastPage = feedingTypes?.last_page || 1;
+
+        if (lastPage <= 7) {
+            for (let i = 1; i <= lastPage; i++) pages.push(i);
+        } else {
+            if (currentPage > 3) {
+                pages.push(1);
+                if (currentPage > 4) pages.push("...");
+            }
+
+            for (
+                let i = Math.max(1, currentPage - 2);
+                i <= Math.min(lastPage, currentPage + 2);
+                i++
+            ) {
+                pages.push(i);
+            }
+
+            if (currentPage < lastPage - 2) {
+                if (currentPage < lastPage - 3) pages.push("...");
+                pages.push(lastPage);
+            }
+        }
+
+        return pages;
+    };
+
+    const handleAddFeedingSubmit = (e) => {
+        e.preventDefault();
+        router.post(
+            "/admin/kelola-bobot/feeding-type?tab=feeding-type",
+            addFeedingForm,
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setShowAddFeedingModal(false);
+                    setAddFeedingForm({
+                        code: "",
+                        name: "",
+                        weight: "",
+                    });
+                    setAddFeedingErrors({});
+                    toast.success("Berhasil!", {
+                        description: "Feeding type berhasil ditambahkan",
+                        duration: 3000,
+                    });
+                },
+                onError: (errors) => {
+                    setAddFeedingErrors(errors);
+                    toast.error("Gagal Menambahkan", {
+                        description: "Mohon periksa kembali form Anda.",
+                        duration: 3000,
+                    });
+                },
+            }
+        );
+    };
+
+    const handleEditFeedingClick = (parameter) => {
+        setSelectedFeedingParam(parameter);
+        setEditFeedingForm({
+            code: parameter?.code || "",
+            name: parameter?.name || "",
+            weight: parameter?.weight ?? "",
+        });
+        setEditFeedingErrors({});
+        setShowEditFeedingModal(true);
+    };
+
+    const handleEditFeedingSubmit = (e) => {
+        e.preventDefault();
+        if (!selectedFeedingParam) return;
+
+        router.put(
+            `/admin/kelola-bobot/feeding-type/${selectedFeedingParam.id}?tab=feeding-type`,
+            editFeedingForm,
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setShowEditFeedingModal(false);
+                    setEditFeedingForm({
+                        code: "",
+                        name: "",
+                        weight: "",
+                    });
+                    setEditFeedingErrors({});
+                    setSelectedFeedingParam(null);
+                    toast.success("Berhasil!", {
+                        description: "Feeding type berhasil diupdate",
+                        duration: 3000,
+                    });
+                },
+                onError: (errors) => {
+                    setEditFeedingErrors(errors);
+                    toast.error("Gagal Update", {
+                        description: "Mohon periksa kembali form Anda.",
+                        duration: 3000,
+                    });
+                },
+            }
+        );
+    };
+
+    const handleDeleteFeedingClick = (parameter) => {
+        setSelectedFeedingParam(parameter);
+        setShowDeleteFeedingModal(true);
+    };
+
+    const handleDeleteFeedingConfirm = () => {
+        if (!selectedFeedingParam) return;
+
+        destroy(
+            `/admin/kelola-bobot/feeding-type/${selectedFeedingParam.id}?tab=feeding-type`,
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setShowDeleteFeedingModal(false);
+                    setSelectedFeedingParam(null);
+                    toast.success("Berhasil!", {
+                        description: "Feeding type berhasil dihapus",
+                        duration: 3000,
+                    });
+                },
+                onError: () => {
+                    toast.error("Gagal!", {
+                        description: "Gagal menghapus parameter",
+                        duration: 3000,
+                    });
+                },
+            }
+        );
+    };
+
+    // Recommendation state
+    const [showEditRecommendationModal, setShowEditRecommendationModal] = useState(false);
+    const [selectedRecommendation, setSelectedRecommendation] = useState(null);
+    const [editRecommendationErrors, setEditRecommendationErrors] = useState({});
+    const [editRecommendationForm, setEditRecommendationForm] = useState({
+        status: "",
+        conclusion: "",
+        recommendation: "",
+    });
+
+    const handleEditRecommendationClick = (rec) => {
+        setSelectedRecommendation(rec);
+        setEditRecommendationForm({
+            status: rec.status,
+            conclusion: rec.conclusion,
+            recommendation: rec.recommendation,
+        });
+        setEditRecommendationErrors({});
+        setShowEditRecommendationModal(true);
+    };
+
+    const handleEditRecommendationSubmit = (e) => {
+        e.preventDefault();
+        if (!selectedRecommendation) return;
+
+        router.put(
+            `/admin/kelola-bobot/recommendation/${selectedRecommendation.id}?tab=recommendation`,
+            {
+                conclusion: editRecommendationForm.conclusion,
+                recommendation: editRecommendationForm.recommendation,
+            },
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setShowEditRecommendationModal(false);
+                    setEditRecommendationForm({ status: "", conclusion: "", recommendation: "" });
+                    setEditRecommendationErrors({});
+                    setSelectedRecommendation(null);
+                    toast.success("Berhasil!", {
+                        description: "Rekomendasi berhasil diupdate",
+                        duration: 3000,
+                    });
+                },
+                onError: (errors) => {
+                    setEditRecommendationErrors(errors);
+                    toast.error("Gagal Update", {
+                        description: "Mohon periksa kembali form Anda.",
+                        duration: 3000,
+                    });
+                },
+            }
+        );
+    };
+
     return (
         <AdminLayout>
             <Toaster className="mt-[60px] md:mt-0" position="top-center" expand={true} richColors />
@@ -934,6 +1198,26 @@ export default function AdminKelolaBobot({
                             }`}
                         >
                             Family Biotic
+                        </Link>
+                        <Link
+                            href="/admin/kelola-bobot?tab=feeding-type"
+                            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                                tab === "feeding-type"
+                                    ? "bg-gradient-to-r from-sky-600 to-indigo-600 text-white shadow-lg"
+                                    : "bg-white text-gray-600 hover:bg-gray-50 shadow-sm"
+                            }`}
+                        >
+                            Feeding Type
+                        </Link>
+                        <Link
+                            href="/admin/kelola-bobot?tab=recommendation"
+                            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                                tab === "recommendation"
+                                    ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg"
+                                    : "bg-white text-gray-600 hover:bg-gray-50 shadow-sm"
+                            }`}
+                        >
+                            Rekomendasi
                         </Link>
                     </div>
 
@@ -1915,6 +2199,293 @@ export default function AdminKelolaBobot({
                                         </div>
                                 </>
                             )}
+
+                            {tab === "feeding-type" && (
+                                <>
+                                     <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                                         <div className="flex flex-wrap items-center justify-center gap-2 w-full md:w-auto">
+                                             <label className="text-sm text-gray-700 font-medium">
+                                                 Tampilkan:
+                                             </label>
+                                             <select
+                                                 value={perPageFeeding}
+                                                 onChange={(e) =>
+                                                     handlePerPageChangeFeeding(
+                                                         e.target.value
+                                                     )
+                                                 }
+                                                 className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                             >
+                                                 <option value={5}>5</option>
+                                                 <option value={10}>10</option>
+                                                 <option value={25}>25</option>
+                                                 <option value={50}>50</option>
+                                                 <option value={100}>100</option>
+                                             </select>
+                                             <span className="text-sm text-gray-700">
+                                                 data per halaman
+                                             </span>
+                                         </div>
+                                         <div className="text-sm text-gray-600 text-center w-full md:w-auto">
+                                             Menampilkan{" "}
+                                             {feedingTypes?.from || 0} -{" "}
+                                             {feedingTypes?.to || 0} dari{" "}
+                                             {feedingTypes?.total || 0} data
+                                         </div>
+                                     </div>
+
+                                     <div className="px-6 py-4 flex justify-between items-center">
+                                         <h2 className="text-lg font-semibold text-gray-800">
+                                             Tabel Bobot Feeding Type
+                                         </h2>
+                                         <button
+                                             onClick={() => {
+                                                 setShowAddFeedingModal(true);
+                                                 setAddFeedingErrors({});
+                                             }}
+                                             className="group flex items-center gap-2 bg-gradient-to-br from-blue-500 via-cyan-500 to-emerald-500 hover:from-blue-600 hover:via-cyan-600 hover:to-emerald-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl hover:scale-105 ring-2 ring-white/30"
+                                             title="Tambah Data"
+                                         >
+                                             <Plus className="w-5 h-5" />
+                                             <span className="hidden sm:inline">Tambah Data</span>
+                                         </button>
+                                     </div>
+
+                                     <div className="overflow-auto max-h-[35vh] relative">
+                                         <table className="w-full">
+                                             <thead className="bg-gradient-to-r from-blue-600 via-cyan-500 to-emerald-500 text-white sticky top-0 z-10">
+                                                 <tr>
+                                                     <th className="px-6 py-4 text-left text-sm font-semibold">
+                                                         ID
+                                                     </th>
+                                                     <th className="px-6 py-4 text-left text-sm font-semibold">
+                                                         Kode
+                                                     </th>
+                                                     <th className="px-6 py-4 text-left text-sm font-semibold">
+                                                         Nama Tipe Makanan
+                                                     </th>
+                                                     <th className="px-6 py-4 text-right text-sm font-semibold">
+                                                         Bobot
+                                                     </th>
+                                                     <th className="px-6 py-4 text-center text-sm font-semibold">
+                                                         Aksi
+                                                     </th>
+                                                 </tr>
+                                             </thead>
+                                             <tbody className="divide-y divide-gray-200">
+                                                 {feedingTypes?.data &&
+                                                 feedingTypes.data.length > 0 ? (
+                                                     feedingTypes.data.map(
+                                                         (param) => (
+                                                             <tr
+                                                                 key={param.id}
+                                                                 className="hover:bg-blue-50 transition-colors"
+                                                             >
+                                                                 <td className="px-6 py-4 text-sm text-gray-700">
+                                                                     {param.id}
+                                                                 </td>
+                                                                 <td className="px-6 py-4 text-sm font-bold text-gray-800">
+                                                                     {param.code}
+                                                                 </td>
+                                                                 <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                                                                     {param.name}
+                                                                 </td>
+                                                                 <td className="px-6 py-4 text-sm text-right text-gray-800">
+                                                                     {param.weight}
+                                                                 </td>
+                                                                 <td className="px-6 py-4 text-sm">
+                                                                     <div className="flex items-center justify-center gap-2">
+                                                                         <button
+                                                                             onClick={() =>
+                                                                                 handleEditFeedingClick(
+                                                                                     param
+                                                                                 )
+                                                                             }
+                                                                             className="p-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition-colors"
+                                                                             title="Edit"
+                                                                         >
+                                                                             <Edit className="w-4 h-4" />
+                                                                         </button>
+                                                                         <button
+                                                                             onClick={() =>
+                                                                                 handleDeleteFeedingClick(
+                                                                                     param
+                                                                                 )
+                                                                             }
+                                                                             className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+                                                                             title="Hapus"
+                                                                         >
+                                                                             <Trash2 className="w-4 h-4" />
+                                                                         </button>
+                                                                     </div>
+                                                                 </td>
+                                                             </tr>
+                                                         )
+                                                     )
+                                                 ) : (
+                                                     <tr>
+                                                         <td
+                                                             colSpan="5"
+                                                             className="px-6 py-8 text-center text-gray-500"
+                                                         >
+                                                             Tidak ada data parameter feeding type
+                                                         </td>
+                                                     </tr>
+                                                 )}
+                                             </tbody>
+                                         </table>
+                                     </div>
+
+                                     <div className="px-6 py-4 border-t border-gray-200 flex flex-col md:flex-row items-center md:justify-between gap-4">
+                                             <div className="text-sm text-gray-600 text-center w-full md:w-auto">
+                                                 Halaman{" "}
+                                                 {feedingTypes.current_page}{" "}
+                                                 dari {feedingTypes.last_page}
+                                             </div>
+
+                                             <div className="flex flex-wrap items-center justify-center gap-2 w-full md:w-auto">
+                                                 <button
+                                                     onClick={() =>
+                                                         handlePageChangeFeeding(
+                                                             feedingTypes.prev_page_url
+                                                         )
+                                                     }
+                                                     disabled={
+                                                         !feedingTypes.prev_page_url
+                                                     }
+                                                     className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                                         feedingTypes.prev_page_url
+                                                             ? "bg-blue-500 text-white hover:bg-blue-600"
+                                                             : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                                                     }`}
+                                                 >
+                                                     <ChevronLeft className="w-4 h-4" />
+                                                     Prev
+                                                 </button>
+
+                                                 <div className="flex flex-wrap items-center justify-center gap-1">
+                                                     {renderPageNumbersFeeding().map(
+                                                         (page, index) => {
+                                                             if (page === "...") {
+                                                                 return (
+                                                                     <span
+                                                                         key={`ellipsis-${index}`}
+                                                                         className="px-3 py-2 text-gray-500"
+                                                                     >
+                                                                         ...
+                                                                     </span>
+                                                                 );
+                                                             }
+
+                                                             const pageUrl = `/admin/kelola-bobot?page=${page}&per_page=${perPageFeeding}&tab=feeding-type`;
+
+                                                             return (
+                                                                 <button
+                                                                     key={page}
+                                                                     onClick={() =>
+                                                                         handlePageChangeFeeding(
+                                                                             pageUrl
+                                                                         )
+                                                                     }
+                                                                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                                                         page ===
+                                                                         feedingTypes.current_page
+                                                                             ? "bg-gradient-to-r from-blue-500 to-cyan-500 text-white"
+                                                                             : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                                                     }`}
+                                                                 >
+                                                                     {page}
+                                                                 </button>
+                                                             );
+                                                         }
+                                                     )}
+                                                 </div>
+
+                                                 <button
+                                                     onClick={() =>
+                                                         handlePageChangeFeeding(
+                                                             feedingTypes.next_page_url
+                                                         )
+                                                     }
+                                                     disabled={
+                                                         !feedingTypes.next_page_url
+                                                     }
+                                                     className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                                         feedingTypes.next_page_url
+                                                             ? "bg-blue-500 text-white hover:bg-blue-600"
+                                                             : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                                                     }`}
+                                                 >
+                                                     Next
+                                                     <ChevronRight className="w-4 h-4" />
+                                                 </button>
+                                             </div>
+                                         </div>
+                                </>
+                            )}
+                        </div>
+                    )}
+
+                    {tab === "recommendation" && (
+                        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+                            <div className={`h-2 bg-gradient-to-r ${content.color}`}></div>
+
+                            <div className="px-6 py-4 border-b border-gray-200">
+                                <h3 className="text-lg font-semibold text-gray-800">
+                                    Tabel Rekomendasi & Kesimpulan
+                                </h3>
+                                <p className="text-sm text-gray-500 mt-1">
+                                    Teks di bawah ini akan digunakan pada hasil kalkulasi baru. Riwayat lama tetap menyimpan teks yang sudah tersimpan.
+                                </p>
+                            </div>
+
+                            <div className="overflow-auto max-h-[60vh] relative">
+                                <table className="w-full">
+                                    <thead className="bg-gradient-to-r from-amber-500 to-orange-500 text-white sticky top-0 z-10">
+                                        <tr>
+                                            <th className="px-6 py-4 text-left text-sm font-semibold whitespace-nowrap">No</th>
+                                            <th className="px-6 py-4 text-left text-sm font-semibold whitespace-nowrap">Status</th>
+                                            <th className="px-6 py-4 text-left text-sm font-semibold whitespace-nowrap">Kesimpulan</th>
+                                            <th className="px-6 py-4 text-left text-sm font-semibold whitespace-nowrap">Rekomendasi</th>
+                                            <th className="px-6 py-4 text-center text-sm font-semibold whitespace-nowrap">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-200">
+                                        {recommendations && recommendations.length > 0 ? (
+                                            recommendations.map((rec, index) => (
+                                                <tr key={rec.id} className="hover:bg-amber-50 transition-colors">
+                                                    <td className="px-6 py-4 text-sm text-gray-700">{index + 1}</td>
+                                                    <td className="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">{rec.status}</td>
+                                                    <td className="px-6 py-4 text-sm text-gray-700 max-w-xs">
+                                                        <div className="line-clamp-3">{rec.conclusion}</div>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-sm text-gray-700 max-w-xs">
+                                                        <div className="line-clamp-3">{rec.recommendation}</div>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-sm">
+                                                        <div className="flex items-center justify-center">
+                                                            <button
+                                                                onClick={() => handleEditRecommendationClick(rec)}
+                                                                className="text-amber-600 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 p-2 rounded-lg transition-colors flex items-center gap-1"
+                                                                title="Edit Rekomendasi"
+                                                            >
+                                                                <Edit className="w-4 h-4" />
+                                                                <span className="hidden xl:inline">Edit</span>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan="5" className="px-6 py-8 text-center text-gray-500">
+                                                    Tidak ada data rekomendasi.
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     )}
                 </div>
@@ -2060,7 +2631,54 @@ export default function AdminKelolaBobot({
                 parameter={selectedFamilyParam}
             />
 
+            <AddFeedingTypeModal
+                isOpen={showAddFeedingModal}
+                onClose={() => {
+                    setShowAddFeedingModal(false);
+                    setAddFeedingErrors({});
+                }}
+                onSubmit={handleAddFeedingSubmit}
+                form={addFeedingForm}
+                setForm={setAddFeedingForm}
+                errors={addFeedingErrors}
+            />
+
+            <EditFeedingTypeModal
+                isOpen={showEditFeedingModal}
+                onClose={() => {
+                    setShowEditFeedingModal(false);
+                    setEditFeedingErrors({});
+                    setSelectedFeedingParam(null);
+                }}
+                onSubmit={handleEditFeedingSubmit}
+                form={editFeedingForm}
+                setForm={setEditFeedingForm}
+                errors={editFeedingErrors}
+                selectedParam={selectedFeedingParam}
+            />
+
+            <DeleteFeedingTypeModal
+                isOpen={showDeleteFeedingModal}
+                onClose={() => setShowDeleteFeedingModal(false)}
+                onConfirm={handleDeleteFeedingConfirm}
+                processing={processing}
+                parameter={selectedFeedingParam}
+            />
+
             <ModalStyles />
+
+            <EditRecommendationModal
+                show={showEditRecommendationModal}
+                onClose={() => {
+                    setShowEditRecommendationModal(false);
+                    setEditRecommendationErrors({});
+                    setSelectedRecommendation(null);
+                }}
+                form={editRecommendationForm}
+                setForm={setEditRecommendationForm}
+                onSubmit={handleEditRecommendationSubmit}
+                errors={editRecommendationErrors}
+            />
         </AdminLayout>
     );
 }

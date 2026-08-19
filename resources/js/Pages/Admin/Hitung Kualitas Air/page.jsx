@@ -27,7 +27,7 @@ import PrintReport from "@/Components/HitungKualitasAir/PrintReport";
 
 // --- Main Page Component ---
 
-export default function AdminHitungKualitasAir({ geoZones, waterTypes, bioticFamilies, initialData, isHistoryView = false, resultData = null }) {
+export default function AdminHitungKualitasAir({ geoZones, waterTypes, bioticFamilies, feedingTypes = [], initialData, isHistoryView = false, resultData = null }) {
     const [currentStep, setCurrentStep] = useState(isHistoryView ? 4 : 1);
     const [result, setResult] = useState(resultData); // To store result after submission or directly if history view
     const [validationErrors, setValidationErrors] = useState({}); // To track empty fields
@@ -117,6 +117,7 @@ export default function AdminHitungKualitasAir({ geoZones, waterTypes, bioticFam
                 if (!fam.name) errors[`family_${index}_name`] = "Nama spesies wajib diisi";
                 if (fam.abundance === "" || fam.abundance === null) errors[`family_${index}_abundance`] = "Kelimpahan wajib diisi";
                 if (fam.taxa_indicator === "" || fam.taxa_indicator === null) errors[`family_${index}_taxa`] = "Taxa Indicator wajib diisi";
+                if (!fam.feeding_type) errors[`family_${index}_feeding_type`] = "Feeding Type wajib dipilih";
             });
         }
         else if (currentStep === 3) {
@@ -238,7 +239,7 @@ export default function AdminHitungKualitasAir({ geoZones, waterTypes, bioticFam
             case 1:
                 return <StationForm data={data} setData={setData} geoZones={geoZones} waterTypes={waterTypes} errors={validationErrors} />;
             case 2:
-                return <MainParameterForm data={data} setData={setData} bioticFamilies={bioticFamilies} errors={validationErrors} />;
+                return <MainParameterForm data={data} setData={setData} bioticFamilies={bioticFamilies} feedingTypes={feedingTypes} errors={validationErrors} />;
             case 3:
                 return <AdditionalParameterForm data={data} setData={setData} errors={validationErrors} />;
             case 4:

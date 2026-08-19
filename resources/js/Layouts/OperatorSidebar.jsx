@@ -18,9 +18,9 @@ const OperatorSidebar = ({ handleLogout, isOpen, setIsOpen }) => {
         {
             href: "/operator/kelola-station",
             icon: MdOutlinePinDrop,
-            label: "Kelola Station",
+            label: "Kelola Riwayat Semua Pengguna",
         },
-        { href: "/operator/history", icon: MdOutlineHistory, label: "History" },
+        { href: "/operator/history", icon: MdOutlineHistory, label: "Kelola Riwayat" },
         {
             href: "/operator/hitung-kualitas-air",
             icon: IoWaterOutline,

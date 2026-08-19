@@ -7,6 +7,7 @@ use App\Models\MainAbioticParameter;
 use App\Models\AdditionalAbioticParameter;
 use App\Models\WaterType;
 use App\Models\BioticFamily;
+use App\Models\Recommendation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -43,6 +44,8 @@ class OperatorKelolaBobot extends Controller
             ->paginate($perPage)
             ->withQueryString();
 
+        $recommendations = Recommendation::orderBy('id')->get();
+
         $geoZones = GeoZone::orderBy('name')->get(['id', 'name']);
         $waterTypes = WaterType::orderBy('name')->get(['id', 'name']);
 
@@ -60,6 +63,7 @@ class OperatorKelolaBobot extends Controller
             'additionalAbioticParameters' => $additionalAbioticParameters,
             'bioticIndexParameters' => $bioticIndexParameters,
             'bioticFamilies' => $bioticFamilies,
+            'recommendations' => $recommendations,
             'geoZones' => $geoZones,
             'waterTypes' => $waterTypes,
         ]);
@@ -243,5 +247,20 @@ class OperatorKelolaBobot extends Controller
     {
         $parameter->delete();
         return redirect()->back()->with('success', 'Family biotic berhasil dihapus');
+    }
+
+    public function updateRecommendation(Request $request, Recommendation $recommendation)
+    {
+        $validated = $request->validate([
+            'conclusion' => 'required|string',
+            'recommendation' => 'required|string',
+        ], [
+            'conclusion.required' => 'Teks kesimpulan harus diisi',
+            'recommendation.required' => 'Teks rekomendasi harus diisi',
+        ]);
+
+        $recommendation->update($validated);
+
+        return redirect()->back()->with('success', 'Rekomendasi berhasil diupdate');
     }
 }

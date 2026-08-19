@@ -125,23 +125,26 @@ export default function AquaLife() {
                             >
                                 Pricing
                             </button>
-                            <button className="w-full px-6 py-2 text-blue-600 border-2 border-blue-600 rounded-lg font-medium">
+                            <Link
+                                href="/registrasi"
+                                className="block w-full text-center px-6 py-2 text-blue-600 border-2 border-blue-600 rounded-lg font-medium"
+                            >
                                 Sign Up
-                            </button>
-                            <button
-                                className="w-full px-6 py-2 bg-blue-600 text-white rounded-lg font-medium"
-                                onClick={() => navigate("/login")}
+                            </Link>
+                            <Link
+                                href="/login"
+                                className="block w-full text-center px-6 py-2 bg-blue-600 text-white rounded-lg font-medium"
                             >
                                 Sign In
-                            </button>
+                            </Link>
                         </div>
                     </div>
                 )}
             </nav>
 
             {/* Hero Section */}
-            <section 
-                id="home" 
+            <section
+                id="home"
                 className="relative pt-28 pb-16 px-4 sm:px-6 lg:px-8 bg-cover bg-center bg-no-repeat"
                 style={{ backgroundImage: "url('/background.png')" }}
             >
@@ -386,9 +389,12 @@ export default function AquaLife() {
                                     </div>
                                 </div>
 
-                                <button className="w-full px-6 py-3 bg-white text-blue-600 rounded-lg hover:bg-blue-50 font-bold transition shadow-lg">
+                                <Link
+                                    href="/registrasi"
+                                    className="block w-full text-center px-6 py-3 bg-white text-blue-600 rounded-lg hover:bg-blue-50 font-bold transition shadow-lg"
+                                >
                                     Mulai Sekarang
-                                </button>
+                                </Link>
                             </div>
                         </div>
                     </div>

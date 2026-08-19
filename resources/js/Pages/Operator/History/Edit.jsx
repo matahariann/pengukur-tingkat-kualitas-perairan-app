@@ -23,7 +23,7 @@ import PrintReport from "@/Components/HitungKualitasAir/PrintReport";
 
 // --- Main Page Component ---
 
-export default function OperatorHistoryEdit({ geoZones, waterTypes, bioticFamilies, initialData }) {
+export default function OperatorHistoryEdit({ geoZones, waterTypes, bioticFamilies, feedingTypes = [], initialData }) {
     const [currentStep, setCurrentStep] = useState(1);
     const [result, setResult] = useState(null); 
     const [validationErrors, setValidationErrors] = useState({}); // To track empty fields
@@ -113,6 +113,7 @@ export default function OperatorHistoryEdit({ geoZones, waterTypes, bioticFamili
                 if (!fam.name) errors[`family_${index}_name`] = "Nama spesies wajib diisi";
                 if (fam.abundance === "" || fam.abundance === null) errors[`family_${index}_abundance`] = "Kelimpahan wajib diisi";
                 if (fam.taxa_indicator === "" || fam.taxa_indicator === null) errors[`family_${index}_taxa`] = "Taxa Indicator wajib diisi";
+                if (!fam.feeding_type) errors[`family_${index}_feeding_type`] = "Feeding Type wajib dipilih";
             });
         }
         else if (currentStep === 3) {
@@ -239,7 +240,7 @@ export default function OperatorHistoryEdit({ geoZones, waterTypes, bioticFamili
             case 1:
                 return <StationForm data={data} setData={setData} geoZones={geoZones} waterTypes={waterTypes} errors={validationErrors} />;
             case 2:
-                return <MainParameterForm data={data} setData={setData} bioticFamilies={bioticFamilies} errors={validationErrors} />;
+                return <MainParameterForm data={data} setData={setData} bioticFamilies={bioticFamilies} feedingTypes={feedingTypes} errors={validationErrors} />;
             case 3:
                 return <AdditionalParameterForm data={data} setData={setData} errors={validationErrors} />;
             case 4:

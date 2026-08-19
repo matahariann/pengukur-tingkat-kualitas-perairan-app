@@ -170,7 +170,8 @@ export default function ResultView({
                                         <tr>
                                             <th className="px-4 py-3">Species/Genus</th>
                                             <th className="px-4 py-3">Family</th>
-                                            <th className="px-4 py-3 text-center">Bobot</th>
+                                            <th className="px-4 py-3">Feeding Type</th>
+                                            <th className="px-4 py-3 text-center">Bobot Family</th>
                                             <th className="px-4 py-3 text-center">Kelimpahan</th>
                                         </tr>
                                     </thead>
@@ -179,11 +180,15 @@ export default function ResultView({
                                             if(!fam.id_family) return null;
                                             const familyName = bioticFamilies?.find(f => f.id == fam.id_family)?.name || fam.name;
                                             const speciesName = fam.name || '-';
+                                            const feedingTypeDisplay = fam.feeding_type 
+                                                ? `${fam.feeding_type} (${fam.feeding_type_weight || 0})` 
+                                                : '-';
                                             return (
                                                 <tr key={idx} className="hover:bg-gray-50">
                                                     <td className="px-4 py-2 italic">{speciesName}</td>
                                                     <td className="px-4 py-2">{familyName}</td>
-                                                    <td className="px-4 py-2 text-center font-medium">-</td>
+                                                    <td className="px-4 py-2">{feedingTypeDisplay}</td>
+                                                    <td className="px-4 py-2 text-center font-medium">{fam.taxa_indicator}</td>
                                                     <td className="px-4 py-2 text-center">{fam.abundance}</td>
                                                 </tr>
                                             );

@@ -18,6 +18,8 @@ class Species extends Model
         'id_user',
         'id_station',
         'id_family',
+        'feeding_type',
+        'feeding_type_weight',
     ];
 
     public function user()

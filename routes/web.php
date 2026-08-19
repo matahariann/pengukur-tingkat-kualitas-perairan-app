@@ -91,6 +91,12 @@ Route::middleware('auth')->group(function () {
         Route::put('/kelola-bobot/family-biotic/{parameter}', [AdminKelolaBobot::class, 'updateFamilyBiotic'])->name('kelola-bobot.family-biotic.update');
         Route::delete('/kelola-bobot/family-biotic/{parameter}', [AdminKelolaBobot::class, 'destroyFamilyBiotic'])->name('kelola-bobot.family-biotic.destroy');
 
+        Route::post('/kelola-bobot/feeding-type', [AdminKelolaBobot::class, 'storeFeedingType'])->name('kelola-bobot.feeding-type.store');
+        Route::put('/kelola-bobot/feeding-type/{parameter}', [AdminKelolaBobot::class, 'updateFeedingType'])->name('kelola-bobot.feeding-type.update');
+        Route::delete('/kelola-bobot/feeding-type/{parameter}', [AdminKelolaBobot::class, 'destroyFeedingType'])->name('kelola-bobot.feeding-type.destroy');
+
+        Route::put('/kelola-bobot/recommendation/{recommendation}', [AdminKelolaBobot::class, 'updateRecommendation'])->name('kelola-bobot.recommendation.update');
+
         // Kelola Pembayaran
         Route::get('/kelola-pembayaran', [AdminKelolaPembayaran::class, 'index'])->name('kelola-pembayaran');
 
@@ -138,6 +144,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/kelola-bobot/family-biotic', [OperatorKelolaBobot::class, 'storeFamilyBiotic'])->name('kelola-bobot.family-biotic.store');
         Route::put('/kelola-bobot/family-biotic/{parameter}', [OperatorKelolaBobot::class, 'updateFamilyBiotic'])->name('kelola-bobot.family-biotic.update');
         Route::delete('/kelola-bobot/family-biotic/{parameter}', [OperatorKelolaBobot::class, 'destroyFamilyBiotic'])->name('kelola-bobot.family-biotic.destroy');
+
+        Route::put('/kelola-bobot/recommendation/{recommendation}', [OperatorKelolaBobot::class, 'updateRecommendation'])->name('kelola-bobot.recommendation.update');
 
         // Kelola Station
         Route::get('/kelola-station', [OperatorKelolaStation::class, 'index'])->name('kelola-station');

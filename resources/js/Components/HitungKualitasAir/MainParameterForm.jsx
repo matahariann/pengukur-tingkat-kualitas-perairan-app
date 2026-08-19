@@ -1,7 +1,7 @@
 import React from "react";
 import { FaFlask, FaVial } from "react-icons/fa";
 
-export default function MainParameterForm({ data, setData, bioticFamilies, errors }) {
+export default function MainParameterForm({ data, setData, bioticFamilies, feedingTypes = [], errors }) {
     
     const recalculateTotals = (familiesArray) => {
         const totalAbundance = familiesArray.reduce((sum, fam) => sum + (parseFloat(fam.abundance) || 0), 0);
@@ -16,7 +16,7 @@ export default function MainParameterForm({ data, setData, bioticFamilies, error
     const handleAddFamily = () => {
         const newFamilies = [
             ...data.families,
-            { id_family: "", name: "", abundance: 0, taxa_indicator: 0 }
+            { id_family: "", name: "", abundance: 0, taxa_indicator: 0, feeding_type: "", feeding_type_weight: 0 }
         ];
         setData({
             ...data,
@@ -48,6 +48,11 @@ export default function MainParameterForm({ data, setData, bioticFamilies, error
             }
         }
 
+        if (field === 'feeding_type') {
+            const selectedType = feedingTypes?.find(ft => ft.code === value);
+            newFamilies[index]['feeding_type_weight'] = selectedType ? selectedType.weight : 0;
+        }
+
         setData({
             ...data,
             families: newFamilies,
@@ -66,7 +71,7 @@ export default function MainParameterForm({ data, setData, bioticFamilies, error
                 <div className="space-y-4">
                     {data.families.map((fam, index) => (
                         <div key={index} className="flex flex-wrap md:flex-nowrap gap-4 items-start bg-gray-50 p-4 rounded-xl shadow-sm border">
-                           <div className="w-full md:w-1/4">
+                           <div className="w-full md:w-[19%]">
                                 <label className="text-xs text-gray-500">Family <span className="text-red-500">*</span></label>
                                 <select 
                                     className={`w-full mt-1 p-2 border rounded-lg text-sm ${errors[`family_${index}_id_family`] ? 'border-red-500 bg-red-50' : ''}`}
@@ -80,7 +85,7 @@ export default function MainParameterForm({ data, setData, bioticFamilies, error
                                 </select>
                                 {errors[`family_${index}_id_family`] && <p className="text-red-500 text-xs mt-1">{errors[`family_${index}_id_family`]}</p>}
                            </div>
-                           <div className="w-full md:w-1/4">
+                           <div className="w-full md:w-[19%]">
                                 <label className="text-xs text-gray-500">Nama Genus/Spesies <span className="text-red-500">*</span></label>
                                 <input 
                                     type="text" 
@@ -91,7 +96,7 @@ export default function MainParameterForm({ data, setData, bioticFamilies, error
                                 />
                                 {errors[`family_${index}_name`] && <p className="text-red-500 text-xs mt-1">{errors[`family_${index}_name`]}</p>}
                            </div>
-                           <div className="w-full md:w-1/4">
+                           <div className="w-full md:w-[19%]">
                                 <label className="text-xs text-gray-500">Kelimpahan <span className="text-red-500">*</span></label>
                                 <input 
                                     type="number" 
@@ -101,7 +106,21 @@ export default function MainParameterForm({ data, setData, bioticFamilies, error
                                 />
                                 {errors[`family_${index}_abundance`] && <p className="text-red-500 text-xs mt-1">{errors[`family_${index}_abundance`]}</p>}
                            </div>
-                           <div className="w-full md:w-1/4">
+                           <div className="w-full md:w-[19%]">
+                                <label className="text-xs text-gray-500">Feeding Type <span className="text-red-500">*</span></label>
+                                 <select 
+                                     className={`w-full mt-1 p-2 border rounded-lg text-sm ${errors[`family_${index}_feeding_type`] ? 'border-red-500 bg-red-50' : ''}`}
+                                     value={fam.feeding_type || ""}
+                                     onChange={(e) => handleFamilyChange(index, "feeding_type", e.target.value)}
+                                 >
+                                     <option value="">Pilih Feeding Type</option>
+                                     {feedingTypes?.map(ft => (
+                                         <option key={ft.id} value={ft.code}>{ft.name} ({ft.code})</option>
+                                     ))}
+                                 </select>
+                                {errors[`family_${index}_feeding_type`] && <p className="text-red-500 text-xs mt-1">{errors[`family_${index}_feeding_type`]}</p>}
+                           </div>
+                           <div className="w-full md:w-[19%]">
                                 <label className="text-xs text-gray-500">Taxa Indicator <span className="text-red-500">*</span></label>
                                 <input 
                                     type="number" step="0.01"
@@ -113,7 +132,7 @@ export default function MainParameterForm({ data, setData, bioticFamilies, error
                            </div>
                            <button 
                                 onClick={() => handleRemoveFamily(index)}
-                                className="text-red-500 hover:text-red-700 p-2 mt-4 md:mt-0"
+                                className="text-red-500 hover:text-red-700 p-2 mt-4 md:mt-0 animate-pulse"
                            >
                                ✕
                            </button>

@@ -36,14 +36,14 @@ const AdminSidebar = ({ handleLogout, isOpen, setIsOpen }) => {
         {
             href: "/admin/kelola-station",
             icon: MdOutlinePinDrop,
-            label: "Kelola Station",
+            label: "Kelola Riwayat Semua Pengguna",
         },
         {
             href: "/admin/kelola-bobot",
             icon: AiOutlineExperiment,
             label: "Kelola Bobot",
         },
-        { href: "/admin/history", icon: MdOutlineHistory, label: "History" },
+        { href: "/admin/history", icon: MdOutlineHistory, label: "Kelola Riwayat" },
         {
             href: "/admin/hitung-kualitas-air",
             icon: IoWaterOutline,

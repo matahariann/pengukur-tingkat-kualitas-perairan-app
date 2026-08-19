@@ -7,6 +7,7 @@ use App\Models\MainAbioticParameter;
 use App\Models\AdditionalAbioticParameter;
 use App\Models\WaterType;
 use App\Models\BioticFamily;
+use App\Models\Recommendation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -43,6 +44,12 @@ class AdminKelolaBobot extends Controller
             ->paginate($perPage)
             ->withQueryString();
 
+        $feedingTypes = \App\Models\FeedingType::orderBy('id')
+            ->paginate($perPage)
+            ->withQueryString();
+
+        $recommendations = Recommendation::orderBy('id')->get();
+
         $geoZones = GeoZone::orderBy('name')->get(['id', 'name']);
         $waterTypes = WaterType::orderBy('name')->get(['id', 'name']);
 
@@ -60,6 +67,8 @@ class AdminKelolaBobot extends Controller
             'additionalAbioticParameters' => $additionalAbioticParameters,
             'bioticIndexParameters' => $bioticIndexParameters,
             'bioticFamilies' => $bioticFamilies,
+            'feedingTypes' => $feedingTypes,
+            'recommendations' => $recommendations,
             'geoZones' => $geoZones,
             'waterTypes' => $waterTypes,
         ]);
@@ -243,5 +252,62 @@ class AdminKelolaBobot extends Controller
     {
         $parameter->delete();
         return redirect()->back()->with('success', 'Family biotic berhasil dihapus');
+    }
+
+    public function storeFeedingType(Request $request)
+    {
+        $validated = $request->validate([
+            'code' => 'required|string|max:255|unique:feeding_types,code',
+            'name' => 'required|string|max:255',
+            'weight' => 'required|numeric',
+        ], [
+            'code.required' => 'Kode feeding type harus diisi',
+            'code.unique' => 'Kode feeding type sudah digunakan',
+            'name.required' => 'Nama feeding type harus diisi',
+            'weight.required' => 'Bobot harus diisi',
+        ]);
+
+        \App\Models\FeedingType::create($validated);
+
+        return redirect()->back()->with('success', 'Feeding type berhasil ditambahkan');
+    }
+
+    public function updateFeedingType(Request $request, \App\Models\FeedingType $parameter)
+    {
+        $validated = $request->validate([
+            'code' => 'required|string|max:255|unique:feeding_types,code,' . $parameter->id,
+            'name' => 'required|string|max:255',
+            'weight' => 'required|numeric',
+        ], [
+            'code.required' => 'Kode feeding type harus diisi',
+            'code.unique' => 'Kode feeding type sudah digunakan',
+            'name.required' => 'Nama feeding type harus diisi',
+            'weight.required' => 'Bobot harus diisi',
+        ]);
+
+        $parameter->update($validated);
+
+        return redirect()->back()->with('success', 'Feeding type berhasil diupdate');
+    }
+
+    public function destroyFeedingType(\App\Models\FeedingType $parameter)
+    {
+        $parameter->delete();
+        return redirect()->back()->with('success', 'Feeding type berhasil dihapus');
+    }
+
+    public function updateRecommendation(Request $request, Recommendation $recommendation)
+    {
+        $validated = $request->validate([
+            'conclusion' => 'required|string',
+            'recommendation' => 'required|string',
+        ], [
+            'conclusion.required' => 'Teks kesimpulan harus diisi',
+            'recommendation.required' => 'Teks rekomendasi harus diisi',
+        ]);
+
+        $recommendation->update($validated);
+
+        return redirect()->back()->with('success', 'Rekomendasi berhasil diupdate');
     }
 }

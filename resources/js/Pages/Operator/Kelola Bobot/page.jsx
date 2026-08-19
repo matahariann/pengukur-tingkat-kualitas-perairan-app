@@ -17,12 +17,14 @@ import DeleteBioticIndexModal from "@/Components/DeleteBioticIndexModal";
 import AddFamilyBioticModal from "@/Components/AddFamilyBioticModal";
 import EditFamilyBioticModal from "@/Components/EditFamilyBioticModal";
 import DeleteFamilyBioticModal from "@/Components/DeleteFamilyBioticModal";
+import EditRecommendationModal from "@/Components/EditRecommendationModal";
 
 export default function OperatorKelolaBobot({
     mainAbioticParameters,
     additionalAbioticParameters,
     bioticIndexParameters,
     bioticFamilies,
+    recommendations,
     geoZones,
     waterTypes,
 }) {
@@ -52,6 +54,12 @@ export default function OperatorKelolaBobot({
                     title: "Bobot Family Biotic",
                     desc: "Konten khusus untuk bobot family biotic.",
                     color: "from-cyan-500 to-emerald-500",
+                };
+            case "recommendation":
+                return {
+                    title: "Rekomendasi & Kesimpulan",
+                    desc: "Kelola teks kesimpulan dan rekomendasi berdasarkan status kualitas air.",
+                    color: "from-amber-500 to-orange-500",
                 };
             case "main-abiotic":
             default:
@@ -166,6 +174,16 @@ export default function OperatorKelolaBobot({
     const [perPageFamily, setPerPageFamily] = useState(
         bioticFamilies?.per_page || 10
     );
+
+    // Recommendation state
+    const [showEditRecommendationModal, setShowEditRecommendationModal] = useState(false);
+    const [selectedRecommendation, setSelectedRecommendation] = useState(null);
+    const [editRecommendationErrors, setEditRecommendationErrors] = useState({});
+    const [editRecommendationForm, setEditRecommendationForm] = useState({
+        status: "",
+        conclusion: "",
+        recommendation: "",
+    });
 
     useEffect(() => {
         if (mainAbioticParameters?.per_page) {
@@ -927,6 +945,16 @@ export default function OperatorKelolaBobot({
                             }`}
                         >
                             Family Biotic
+                        </Link>
+                        <Link
+                            href="/operator/kelola-bobot?tab=recommendation"
+                            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                                tab === "recommendation"
+                                    ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg"
+                                    : "bg-white text-gray-600 hover:bg-gray-50 shadow-sm"
+                            }`}
+                        >
+                            Rekomendasi
                         </Link>
                     </div>
 
@@ -1910,6 +1938,66 @@ export default function OperatorKelolaBobot({
                             )}
                         </div>
                     )}
+
+                    {tab === "recommendation" && (
+                        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+                            <div className="h-2 bg-gradient-to-r from-amber-500 to-orange-500"></div>
+                            <div className="p-6">
+                                <h2 className="text-xl font-bold text-gray-800 mb-1">Rekomendasi & Kesimpulan</h2>
+                                <p className="text-sm text-gray-500 mb-6">Kelola teks kesimpulan dan rekomendasi untuk setiap status kualitas air.</p>
+                                <div className="space-y-4">
+                                    {recommendations && recommendations.length > 0 ? (
+                                        recommendations.map((rec, index) => (
+                                            <div key={rec.id} className="border border-gray-200 rounded-xl p-5 hover:border-amber-300 hover:shadow-md transition-all">
+                                                <div className="flex items-center justify-between mb-3">
+                                                    <div className="flex items-center gap-3">
+                                                        <span className={`px-3 py-1 rounded-full text-xs font-bold text-white ${
+                                                            rec.status === 'Undisturbed Areas' ? 'bg-emerald-500' :
+                                                            rec.status === 'Lightly Disturbed Areas' ? 'bg-blue-500' :
+                                                            rec.status === 'Moderately Disturbed Areas' ? 'bg-amber-500' :
+                                                            'bg-red-500'
+                                                        }`}>
+                                                            {rec.status}
+                                                        </span>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => {
+                                                            setSelectedRecommendation(rec);
+                                                            setEditRecommendationForm({
+                                                                status: rec.status,
+                                                                conclusion: rec.conclusion,
+                                                                recommendation: rec.recommendation,
+                                                            });
+                                                            setEditRecommendationErrors({});
+                                                            setShowEditRecommendationModal(true);
+                                                        }}
+                                                        className="flex items-center gap-1.5 px-3 py-1.5 text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg text-sm font-medium transition-colors"
+                                                    >
+                                                        <Edit className="w-4 h-4" />
+                                                        Edit
+                                                    </button>
+                                                </div>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div>
+                                                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Kesimpulan</p>
+                                                        <p className="text-sm text-gray-700 leading-relaxed">{rec.conclusion}</p>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Rekomendasi</p>
+                                                        <p className="text-sm text-gray-700 leading-relaxed">{rec.recommendation}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="text-center py-8 text-gray-500">
+                                            Tidak ada data rekomendasi.
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </main>
 
@@ -2054,6 +2142,42 @@ export default function OperatorKelolaBobot({
             />
 
             <ModalStyles />
+
+            <EditRecommendationModal
+                show={showEditRecommendationModal}
+                onClose={() => {
+                    setShowEditRecommendationModal(false);
+                    setEditRecommendationErrors({});
+                    setSelectedRecommendation(null);
+                }}
+                form={editRecommendationForm}
+                setForm={setEditRecommendationForm}
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    if (!selectedRecommendation) return;
+                    router.put(
+                        `/operator/kelola-bobot/recommendation/${selectedRecommendation.id}?tab=recommendation`,
+                        {
+                            conclusion: editRecommendationForm.conclusion,
+                            recommendation: editRecommendationForm.recommendation,
+                        },
+                        {
+                            preserveScroll: true,
+                            onSuccess: () => {
+                                setShowEditRecommendationModal(false);
+                                setEditRecommendationForm({ status: "", conclusion: "", recommendation: "" });
+                                setEditRecommendationErrors({});
+                                setSelectedRecommendation(null);
+                                toast.success("Rekomendasi berhasil diupdate");
+                            },
+                            onError: (errors) => {
+                                setEditRecommendationErrors(errors);
+                            },
+                        }
+                    );
+                }}
+                errors={editRecommendationErrors}
+            />
         </OperatorLayout>
     );
 }

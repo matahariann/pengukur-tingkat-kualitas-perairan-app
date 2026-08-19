@@ -11,7 +11,7 @@ const MemberSidebar = ({ handleLogout, isOpen, setIsOpen }) => {
     const { url } = usePage();
 
     const menuItems = [
-        { href: "/member/history", icon: MdOutlineHistory, label: "History" },
+        { href: "/member/history", icon: MdOutlineHistory, label: "Kelola Riwayat" },
         {
             href: "/member/hitung-kualitas-air",
             icon: IoWaterOutline,
